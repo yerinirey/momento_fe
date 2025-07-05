@@ -1,7 +1,9 @@
-import FloatingBackButton from "@/components/Shared/FloatingBackButton";
 // import ModelView from "@/components/Shared/ModelView";
+import FloatingBackButton from "@/components/Shared/FloatingBackButton";
+import ModelView from "@/components/Shared/ModelView";
 import { router, useLocalSearchParams } from "expo-router";
 import { View } from "react-native";
+import { Text } from "tamagui";
 
 // export default function ProductARScreen() {
 //   const { modelUrl } = useLocalSearchParams<{ modelUrl: string }>();
@@ -27,7 +29,8 @@ export default function ThreeDScreen() {
   return (
     <View style={{ flex: 1 }}>
       <FloatingBackButton onPress={() => router.back()} />
-      {/* <ModelView modelUrl={modelUrl} /> */}
+      <Text>WHY</Text>
+      <ModelView modelUrl={modelUrl} />
     </View>
   );
 }
