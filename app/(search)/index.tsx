@@ -42,6 +42,7 @@ export default function SearchScreen() {
         keyExtractor={(item) => item.id.toString()}
         ItemSeparatorComponent={() => <YStack h={10} />}
         ListEmptyComponent={<Text>No Products Found</Text>}
+        keyboardShouldPersistTaps='handled'
         renderItem={({ item: product }) => (
           <ProductCardResult
             product={product}

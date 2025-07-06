@@ -37,12 +37,14 @@ export function Header({ options }: StackHeaderProps | TabsHeaderProps) {
           gap={20}
           mt={edgeInsets.top + 10}
         >
-          <YStack f={1}>{options.headerLeft && <options.headerLeft />}</YStack>
-          <YStack f={1}>
+          <YStack key="headerLeft" f={1}>
+            {options.headerLeft && <options.headerLeft />}
+          </YStack>
+          <YStack key="headerTitle" f={1}>
             {/* @ts-ignore */}
             {options.headerTitle && <options.headerTitle />}
           </YStack>
-          <YStack f={1}>
+          <YStack key="headerRight" f={1}>
             {/* @ts-ignore */}
             {options.headerRight && <options.headerRight />}
           </YStack>
