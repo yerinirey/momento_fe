@@ -1,5 +1,8 @@
-import { useEffect, useState } from "react";
+import { OrbitControls } from "@react-three/drei";
+import { Canvas } from "@react-three/fiber";
+import { Suspense, useEffect, useState } from "react";
 import { ActivityIndicator } from "react-native";
+import Model from "../3dModel/Model";
 type ModelProps = {
   modelUrl: string;
 };
@@ -9,14 +12,14 @@ export default function ModelView({ modelUrl }: ModelProps) {
   useEffect(() => {
     const timer = setTimeout(() => {
       setCanLoad(true);
-    }, 2000); // 5초 후 로딩 허용
+    }, 5000); // 5초 후 로딩 허용
 
     return () => clearTimeout(timer);
   }, []);
 
   return (
     <>
-      {/* {!canLoad ? (
+      {canLoad ? (
         <Canvas
           style={{ flex: 1, backgroundColor: "brown" }}
           frameloop="demand"
@@ -32,14 +35,13 @@ export default function ModelView({ modelUrl }: ModelProps) {
             <Model modelUrl={modelUrl} />
           </Suspense>
         </Canvas>
-
-      ) : ( */}
-      <ActivityIndicator
-        size="large"
-        color="white"
-        style={{ flex: 1, backgroundColor: "black" }}
-      />
-      {/* )} */}
+      ) : (
+        <ActivityIndicator
+          size="large"
+          color="white"
+          style={{ flex: 1, backgroundColor: "black" }}
+        />
+      )}
     </>
   );
 }
