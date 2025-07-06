@@ -12,7 +12,6 @@ SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const rootNavigationState = useRootNavigationState();
-  console.log("RootLayout rendered");
 
   useEffect(() => {
     if (rootNavigationState != null) {

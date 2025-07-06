@@ -27,9 +27,9 @@ export default function ThreeDScreen() {
   const { modelUrl } = useLocalSearchParams<{ modelUrl: string }>();
   // console.log("??");
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1, paddingTop: 50 }}>
       <FloatingBackButton onPress={() => router.back()} />
-      <Text>WHY</Text>
+      <Text>asdf</Text>
       <ModelView modelUrl={modelUrl} />
     </View>
   );
