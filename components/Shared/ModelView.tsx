@@ -1,34 +1,27 @@
-import { useGLTF } from "@react-three/drei";
-import { Canvas, useFrame } from "@react-three/fiber/native";
-import { useRef } from "react";
-import { View } from "react-native";
-
+import { OrbitControls } from "@react-three/drei";
+import { Canvas } from "@react-three/fiber/native";
+import { Suspense, useState } from "react";
+import Model from "../3dModel/Model";
+import Trigger from "../3dModel/Trigger";
 type ModelProps = {
   modelUrl: string;
 };
 
-function Model({ modelUrl }: ModelProps) {
-  const ref = useRef<any>(null);
-  const { scene } = useGLTF(modelUrl);
-
-  useFrame(() => {
-    if (ref.current) {
-      ref.current.rotation.y += 0.01;
-    }
-  });
-
-  return <primitive object={scene} ref={ref} scale={5} />;
-}
-
 export default function ModelView({ modelUrl }: ModelProps) {
+  const [loading, setLoading] = useState<boolean>(false);
+
   return (
-    <View style={{ flex: 1 }}>
-      <Canvas style={{ flex: 1, backgroundColor: "black" }}>
-        <ambientLight intensity={0.5} />
-        <directionalLight position={[3, 3, 3]} intensity={1} />
-        <pointLight position={[-3, 2, 2]} intensity={0.8} />
+    <Canvas style={{ flex: 1, backgroundColor: "black" }}>
+      <OrbitControls enablePan={false} enableZoom={false} />
+      <directionalLight position={[1, 0, 0]} args={["white", 2]} />
+      <directionalLight position={[-1, 0, 0]} args={["white", 2]} />
+      <directionalLight position={[0, 0, 1]} args={["white", 2]} />
+      <directionalLight position={[0, 0, -1]} args={["white", 2]} />
+      <directionalLight position={[0, 1, 0]} args={["white", 15]} />
+      <directionalLight position={[0, -1, 0]} args={["white", 2]} />
+      <Suspense fallback={<Trigger setLoading={setLoading} />}>
         <Model modelUrl={modelUrl} />
-      </Canvas>
-    </View>
+      </Suspense>
+    </Canvas>
   );
 }
