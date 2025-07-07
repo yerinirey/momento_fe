@@ -86,9 +86,6 @@ export default function ProductScreen() {
           >
             {isBookmarked ? "Remove Bookmark" : "Add Bookmark"}
           </DefaultButton>
-          <DefaultButton bg={"$orange9Light"} onPress={() => {}}>
-            Buy Now
-          </DefaultButton>
         </YStack>
       </ScrollView>
     </>
