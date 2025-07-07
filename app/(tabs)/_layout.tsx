@@ -1,5 +1,5 @@
 import { Header } from "@/components/Shared/header/Header";
-import { useCart } from "@/context/CartProvider";
+import { useBookmark } from "@/context/BookmarkProvider";
 import MCIcon from "@expo/vector-icons/MaterialCommunityIcons";
 import { Tabs } from "expo-router";
 import { Text, XStack, YStack } from "tamagui";
@@ -9,7 +9,7 @@ interface Tab {
   icon: "home-outline" | "account-outline" | "cart-check";
 }
 export default function TabLayout() {
-  const { items } = useCart();
+  const { bookmarkedItems } = useBookmark();
   const tabs: Tab[] = [
     {
       name: "index",
@@ -71,7 +71,7 @@ export default function TabLayout() {
                     fos={12}
                     col={focused ? "#238db0" : "black"}
                   >
-                    {items.length}
+                    {bookmarkedItems.length}
                   </Text>
                 )}
               </YStack>

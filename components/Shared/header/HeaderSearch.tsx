@@ -9,8 +9,8 @@ export function HeaderSearch() {
   const segments = useSegments();
   const ref = useRef<Input>(null);
   const [query, setQuery] = useState("");
-  const isSearchScreen = segments[0] === "(search)";
-
+  const isSearchScreen = segments[0] === "(search)" && segments.length === 1;
+  console.log(segments);
   const navigateToSearch = () => {
     if (!isSearchScreen) router.push("/(search)");
   };

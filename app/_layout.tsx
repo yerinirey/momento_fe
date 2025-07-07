@@ -1,6 +1,6 @@
 import { Header } from "@/components/Shared/header/Header";
 import { AuthProvider, useAuth } from "@/context/AuthProvider";
-import { CartProvider } from "@/context/CartProvider";
+import { BookmarkProvider } from "@/context/BookmarkProvider";
 import { router, Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
@@ -36,12 +36,12 @@ const AppLayout = () => {
 export default function RootLayout() {
   return (
     <AuthProvider>
-      <CartProvider>
+      <BookmarkProvider>
         <TamaguiProvider config={tamaguiConfig}>
           <StatusBar style="auto" />
           <AppLayout />
         </TamaguiProvider>
-      </CartProvider>
+      </BookmarkProvider>
     </AuthProvider>
   );
 }
