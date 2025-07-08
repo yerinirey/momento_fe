@@ -11,7 +11,6 @@ export default function ProductScreen() {
   const { toggleBookmark, bookmarks } = useBookmark();
   const { id } = useLocalSearchParams();
   const [product, setProduct] = useState<Product | null>(null);
-
   const fetchProducts = useCallback(async () => {
     try {
       const { data = null } = await supabase

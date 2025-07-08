@@ -1,7 +1,7 @@
 import { useDebouncedCallback } from "@/hooks/useDebouncedCallback";
 import Icon from "@expo/vector-icons/Ionicons";
 import { router, useSegments } from "expo-router";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { Pressable } from "react-native";
 import { Input, XStack } from "tamagui";
 
@@ -9,10 +9,12 @@ export function HeaderSearch() {
   const segments = useSegments();
   const ref = useRef<Input>(null);
   const [query, setQuery] = useState("");
-  const isSearchScreen = segments[0] === "(search)" && segments.length === 1;
-  console.log(segments);
-  const navigateToSearch = () => {
-    if (!isSearchScreen) router.push("/(search)");
+  const isSearchScreen = segments[0] === "(search)";
+
+  const onPressIn = () => {
+    if (!isSearchScreen || segments.length !== 1) {
+      router.push("/(search)");
+    }
   };
 
   const onGoBack = () => {
@@ -20,15 +22,12 @@ export function HeaderSearch() {
     router.dismissAll();
   };
 
-  useEffect(() => {
-    if (isSearchScreen) {
-      ref.current?.focus();
-    }
-  }, [isSearchScreen]);
-
   useDebouncedCallback(
     () => {
       if (query) router.setParams({ query });
+      if (segments.length === 1 && segments[0] === "(search)") {
+        ref.current?.focus();
+      }
     },
     [query],
     500
@@ -54,21 +53,21 @@ export function HeaderSearch() {
         shof={{ width: 0, height: 2 }}
         shop={0.4}
         shar={4}
-        onPress={!isSearchScreen ? navigateToSearch : undefined}
       >
         <Icon name="search" color={"black"} size={24} />
         <Input
           ref={ref}
           value={query}
-          editable={isSearchScreen}
+          // editable={isSearchScreen}
+          onPressIn={onPressIn}
           onChangeText={setQuery}
           w={"75%"}
           bg={"white"}
           fow={800}
           fos={20}
           bw={0}
-          placeholder="Search Amazon"
-          pointerEvents={isSearchScreen ? "auto" : "none"}
+          placeholder="Search"
+          // pointerEvents={isSearchScreen ? "auto" : "none"}
         />
         <Icon name="scan" color={"black"} size={24} />
       </XStack>
