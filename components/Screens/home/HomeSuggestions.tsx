@@ -1,17 +1,22 @@
 import { Dimensions } from "react-native";
 import { Image, ScrollView, Text, YStack } from "tamagui";
 
-import {
-  default as IMG_AD_1,
-  default as IMG_AD_3,
-} from "@/assets/home-sugg-1.png";
-import IMG_AD_2 from "@/assets/home-sugg-2.png";
-const images = [IMG_AD_1, IMG_AD_2, IMG_AD_3];
+import { default as IMG_AD_1 } from "@/assets/home-func-1.png";
+import { GradientBackground } from "@/components/Shared/GradientBackground";
+const images = [IMG_AD_1, IMG_AD_1, IMG_AD_1];
 
 export function HomeSuggestions() {
   return (
-    <YStack h={170} w={Dimensions.get("window").width}>
-      <ScrollView horizontal mt={-50} showsHorizontalScrollIndicator={false}>
+    <YStack pt={10} w={Dimensions.get("window").width}>
+      <Text ml={20} fontSize={24} fow={"bold"}>
+        기능 설명란
+      </Text>
+      <ScrollView
+        horizontal
+        mt={10}
+        mb={10}
+        showsHorizontalScrollIndicator={false}
+      >
         {images.map((image, index) => (
           <YStack
             key={index}
@@ -26,7 +31,7 @@ export function HomeSuggestions() {
             shar={6}
           >
             <Text fow={"bold"} px={10} pt={10} pb={26}>
-              New Arrivals
+              {index + 1}
             </Text>
             <Image
               source={{ uri: image }}
@@ -38,6 +43,7 @@ export function HomeSuggestions() {
           </YStack>
         ))}
       </ScrollView>
+      <GradientBackground type="card" />
     </YStack>
   );
 }

@@ -6,7 +6,7 @@ import { Text, XStack, YStack } from "tamagui";
 
 interface Tab {
   name: string;
-  icon: "home-outline" | "account-outline" | "cart-check";
+  icon: "home-outline" | "account-outline" | "bookmark-outline";
 }
 export default function TabLayout() {
   const { bookmarkedItems } = useBookmark();
@@ -20,8 +20,8 @@ export default function TabLayout() {
       icon: "account-outline",
     },
     {
-      name: "cart",
-      icon: "cart-check",
+      name: "bookmark",
+      icon: "bookmark-outline",
     },
   ];
 
@@ -51,16 +51,16 @@ export default function TabLayout() {
                   width={50}
                   height={4}
                   borderRadius={20}
-                  bg={focused ? "#238db0" : "$colorTransparent"}
+                  bg={focused ? "#8F87F1" : "$colorTransparent"}
                 />
-                {/* TODO: Add Icon */}
+
                 <MCIcon
                   name={tab.icon}
                   size={30}
-                  color={focused ? "#238db0" : "black"}
+                  color={focused ? "#8F87F1" : "black"}
                 />
-                {/* TODO: Items.length in the cart*/}
-                {tab.name === "cart" && (
+
+                {tab.name === "bookmark" && (
                   <Text
                     paddingVertical={4}
                     borderRadius={10}
@@ -68,8 +68,9 @@ export default function TabLayout() {
                     top={11}
                     backgroundColor={"white"}
                     fow={"bold"}
-                    fos={12}
-                    col={focused ? "#238db0" : "black"}
+                    fos={14}
+                    // col={focused ? "#8F87F1" : "black"}
+                    col="#8F87F1"
                   >
                     {bookmarkedItems.length}
                   </Text>

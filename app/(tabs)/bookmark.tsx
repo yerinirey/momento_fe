@@ -1,10 +1,11 @@
 import ProductCart from "@/components/Screens/cart/ProductCart";
 import { HeaderTabsProps } from "@/components/Shared/header/HeaderTabs";
 import { useBookmark } from "@/context/BookmarkProvider";
+import Icon from "@expo/vector-icons/Ionicons";
 import { useNavigation } from "expo-router";
 import { useEffect } from "react";
 import { Alert } from "react-native";
-import { Image, ScrollView, Text, YStack } from "tamagui";
+import { ScrollView, Text, YStack } from "tamagui";
 
 export default function Cart() {
   const { bookmarkedItems } = useBookmark();
@@ -34,13 +35,9 @@ export default function Cart() {
           ))
         ) : (
           <>
-            <Image
-              source={require("@/assets/empty-cart.png")}
-              w={300}
-              h={200}
-            />
+            <Icon marginTop={10} name="bookmarks" size={140} />
             <Text fow={"bold"} fos={26}>
-              Your bookmark list is empty
+              저장한 모멘토가 없습니다.
             </Text>
           </>
         )}

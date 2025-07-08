@@ -1,5 +1,4 @@
 import { Product } from "@/types/product";
-import React from "react";
 import { Image, Text, XStack, YStack } from "tamagui";
 interface Props {
   product: Product;

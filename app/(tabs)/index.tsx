@@ -1,4 +1,3 @@
-import { HomeCarousel } from "@/components/Screens/home/HomeCarousel";
 import { HomeSuggestions } from "@/components/Screens/home/HomeSuggestions";
 import { ProductDealCard } from "@/components/Screens/home/ProductDealCard";
 import { DefaultButton } from "@/components/Shared/DefaultButton";
@@ -56,7 +55,7 @@ export default function Home() {
 
   return (
     <ScrollView f={1}>
-      <HomeCarousel />
+      {/* <HomeCarousel /> */}
       <HomeSuggestions />
       <YStack bg={"white"} w={"100%"} p={20} gap={20}>
         <Text als={"flex-start"} fos={20} fow={"bold"}>

@@ -1,6 +1,10 @@
 import { LinearGradient } from "expo-linear-gradient";
 
-export function GradientBackground() {
+type Props = {
+  type?: string;
+};
+
+export function GradientBackground({ type }: Props) {
   return (
     <LinearGradient
       style={{
@@ -11,9 +15,9 @@ export function GradientBackground() {
         bottom: 0,
         zIndex: -1,
       }}
-      colors={["#84def0", "#c1f0dd"]}
+      colors={type === "card" ? ["#C68EFD", "#FED2E2"] : ["#8F87F1", "#C68EFD"]}
       start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 0 }}
+      end={{ x: 1, y: 1 }}
     />
   );
 }
