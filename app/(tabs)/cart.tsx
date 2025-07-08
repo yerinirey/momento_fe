@@ -1,14 +1,13 @@
 import ProductCart from "@/components/Screens/cart/ProductCart";
-import { DeliveryLocation } from "@/components/Shared/DeliveryLocation";
 import { HeaderTabsProps } from "@/components/Shared/header/HeaderTabs";
 import { useBookmark } from "@/context/BookmarkProvider";
-import { router, useNavigation } from "expo-router";
-import React, { useEffect } from "react";
-import { Alert, ActivityIndicator } from "react-native";
+import { useNavigation } from "expo-router";
+import { useEffect } from "react";
+import { Alert } from "react-native";
 import { Image, ScrollView, Text, YStack } from "tamagui";
 
 export default function Cart() {
-  const { bookmarkedItems, loading } = useBookmark();
+  const { bookmarkedItems } = useBookmark();
   const navigation = useNavigation();
 
   const tabs: HeaderTabsProps["tabs"] = [
@@ -28,11 +27,8 @@ export default function Cart() {
 
   return (
     <ScrollView f={1} bg={"white"} contentContainerStyle={{ pb: 20 }}>
-      <DeliveryLocation />
       <YStack f={1} jc={"center"} ai={"center"} gap={20} px={20}>
-        {loading ? (
-          <ActivityIndicator size="large" color="#0000ff" />
-        ) : bookmarkedItems.length ? (
+        {bookmarkedItems.length ? (
           bookmarkedItems.map((item) => (
             <ProductCart key={item.id} product={item} />
           ))

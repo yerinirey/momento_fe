@@ -2,13 +2,12 @@ import { HomeCarousel } from "@/components/Screens/home/HomeCarousel";
 import { HomeSuggestions } from "@/components/Screens/home/HomeSuggestions";
 import { ProductDealCard } from "@/components/Screens/home/ProductDealCard";
 import { DefaultButton } from "@/components/Shared/DefaultButton";
-import { DeliveryLocation } from "@/components/Shared/DeliveryLocation";
 import { HeaderTabsProps } from "@/components/Shared/header/HeaderTabs";
 import { useAuth } from "@/context/AuthProvider";
 import { supabase } from "@/supabase";
 import { Product } from "@/types/product";
 import { router, useNavigation } from "expo-router";
-import React, { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Alert } from "react-native";
 import { ScrollView, Text, XStack, YStack } from "tamagui";
 
@@ -16,32 +15,32 @@ export default function Home() {
   const navigation = useNavigation();
   const { session } = useAuth();
 
-  const [deals, setDeals] = useState<Product[]>([]);
+  const [trends, setTrends] = useState<Product[]>([]);
 
   const onClickAuth = () => router.push("/login");
   const tabs: HeaderTabsProps["tabs"] = [
     {
       active: true,
-      title: "Alexa Lists",
-      onPress: () => Alert.alert("Alexa Lists"),
+      title: "Home",
+      onPress: () => Alert.alert("Home"),
     },
     {
-      title: "Prime",
-      onPress: () => Alert.alert("Prime"),
+      title: "Trend",
+      onPress: () => Alert.alert("Trend"),
     },
     {
-      title: "Video",
-      onPress: () => Alert.alert("Video"),
+      title: "New",
+      onPress: () => Alert.alert("New"),
     },
   ];
   const onProductPress = ({ id }: Product) => {
     router.push(`/product/${id}`);
   };
-  const getDeals = useCallback(async () => {
+  const getTrend = useCallback(async () => {
     try {
       const { data = [] } = await supabase.from("products").select("*");
-      setDeals(data as Product[]);
-      // console.log("🛒 ~ getDeals ~ data:", JSON.stringify(data, null, 2));
+      setTrends(data as Product[]);
+      // console.log("🛒 ~ getTrend ~ data:", JSON.stringify(data, null, 2));
     } catch (error) {
       console.log("error", error);
     }
@@ -52,21 +51,20 @@ export default function Home() {
       headerSearchShown: true,
       headerTabsProps: { tabs },
     });
-    getDeals();
-  }, [navigation.setOptions, getDeals]);
+    getTrend();
+  }, [navigation, getTrend]);
 
   return (
     <ScrollView f={1}>
-      <DeliveryLocation />
       <HomeCarousel />
       <HomeSuggestions />
       <YStack bg={"white"} w={"100%"} p={20} gap={20}>
         <Text als={"flex-start"} fos={20} fow={"bold"}>
-          {session ? "Deals for you" : "Sign in for your best experience"}
+          {session ? "Trending things" : "Sign in for your best experience"}
         </Text>
         {session ? (
           <XStack gap={30} jc={"space-between"} fw={"wrap"}>
-            {deals.map((product) => (
+            {trends.map((product) => (
               <ProductDealCard
                 key={product.id}
                 product={product}

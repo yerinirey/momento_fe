@@ -1,11 +1,11 @@
-import AmazonLogo from "@/assets/amazon-logo.png";
+import Logo from "@/assets/logo.png";
 import { ProfileUnauthedBanner } from "@/components/Screens/profile/ProfileUnauthedBanner";
 import { DefaultButton } from "@/components/Shared/DefaultButton";
 import { useAuth } from "@/context/AuthProvider";
 import { supabase } from "@/supabase";
 import Icon from "@expo/vector-icons/Ionicons";
 import { router, useNavigation } from "expo-router";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Pressable } from "react-native";
 import {
   Avatar,
@@ -36,7 +36,7 @@ export default function Profile() {
     navigation.setOptions({
       headerSearchShown: Boolean(session),
       headerLeft: !session
-        ? () => <Image source={{ uri: AmazonLogo }} w={100} h={30} />
+        ? () => <Image source={{ uri: Logo }} w={100} h={30} />
         : null,
     });
   }, [navigation.setOptions, session]);

@@ -71,14 +71,11 @@ export default function ProductScreen() {
             </>
           )}
         </XStack>
-        <Text>
-          The prices of products sold on Amazon include VAT. Depending on your
-          delivery address, VAT may vary at the checkout. For more information,
-          click somewhere.
-        </Text>
+        <Text>Text</Text>
 
         <YStack gap={20} mb={30}>
           <DefaultButton
+            variant={!isBookmarked ? "primary" : "secondary"}
             onPress={() => {
               toggleBookmark(product);
             }}

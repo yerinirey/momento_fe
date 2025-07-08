@@ -10,10 +10,11 @@ interface Props {
 }
 
 export function ProductCardResult({ product, onPress }: Props) {
-  const { toggleBookmark } = useBookmark();
+  const { toggleBookmark, bookmarks } = useBookmark();
+  const isBookmarked = product.id in bookmarks;
   return (
     <Pressable onPress={onPress}>
-      <XStack h={300} bc={"$gray5Light"} br={6} bw={1}>
+      <XStack h={200} bc={"$gray5Light"} br={6} bw={1}>
         <Image
           src={product.imageUrl ?? ""}
           objectFit="contain"
@@ -29,6 +30,7 @@ export function ProductCardResult({ product, onPress }: Props) {
             {product.name}
           </Text>
           <DefaultButton
+            variant={!isBookmarked ? "primary" : "secondary"}
             mt="auto"
             onPress={() => {
               toggleBookmark(product);
@@ -36,7 +38,7 @@ export function ProductCardResult({ product, onPress }: Props) {
             h={40}
             textProps={{ fos: 14 }}
           >
-            {product.bookmark ? "Remove Bookmark" : "Add Bookmark"}
+            {isBookmarked ? "Remove Bookmark" : "Add Bookmark"}
           </DefaultButton>
         </YStack>
       </XStack>
