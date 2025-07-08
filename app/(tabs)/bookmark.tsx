@@ -28,7 +28,7 @@ export default function Cart() {
 
   return (
     <ScrollView f={1} bg={"white"} contentContainerStyle={{ pb: 20 }}>
-      <YStack f={1} jc={"center"} ai={"center"} gap={20} px={20}>
+      <YStack f={1} jc={"center"} ai={"center"} gap={20} px={20} pt={10}>
         {bookmarkedItems.length ? (
           bookmarkedItems.map((item) => (
             <ProductCart key={item.id} product={item} />

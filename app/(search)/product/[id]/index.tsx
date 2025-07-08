@@ -80,7 +80,7 @@ export default function ProductScreen() {
               toggleBookmark(product);
             }}
           >
-            {isBookmarked ? "Remove Bookmark" : "Add Bookmark"}
+            {isBookmarked ? "저장 취소" : "내 모멘토에 저장"}
           </DefaultButton>
         </YStack>
       </ScrollView>

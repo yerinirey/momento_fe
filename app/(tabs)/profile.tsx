@@ -1,5 +1,4 @@
 import Logo from "@/assets/logo.png";
-import { ProfileUnauthedBanner } from "@/components/Screens/profile/ProfileUnauthedBanner";
 import { DefaultButton } from "@/components/Shared/DefaultButton";
 import { useAuth } from "@/context/AuthProvider";
 import { supabase } from "@/supabase";
@@ -50,7 +49,7 @@ export default function Profile() {
                 <Avatar circular size={30}>
                   <Avatar.Fallback bg={"gray"} />
                 </Avatar>
-                <Text fos={18}>Hello, {session?.user.email}</Text>
+                <Text fos={18}>{session?.user.email}</Text>
                 <Icon name="chevron-down" size={20} />
               </XStack>
             </Pressable>
@@ -63,16 +62,16 @@ export default function Profile() {
           <YStack f={1} pt={40} ai={"center"} gap={45}>
             <YStack w={"100%"} jc={"center"} ai={"center"} gap={40}>
               <Text ta={"center"} fos={24}>
-                Sign in for the optimal experience
+                로그인하고 모멘토를 둘러보세요.
               </Text>
             </YStack>
             <YStack w={"90%"} gap={15}>
-              <DefaultButton onPress={onClickAuth}>Sign In</DefaultButton>
+              <DefaultButton onPress={onClickAuth}>로그인</DefaultButton>
               <DefaultButton onPress={onClickAuth} variant="secondary">
-                Create Account
+                계정 생성
               </DefaultButton>
             </YStack>
-            <ProfileUnauthedBanner />
+            {/* <ProfileUnauthedBanner /> */}
           </YStack>
         )}
       </ScrollView>
@@ -86,7 +85,7 @@ export default function Profile() {
         <Sheet.Frame p={20} gap={20} minHeight={120}>
           <Text>{session?.user.email}</Text>
           <Button textProps={{ fos: 18 }} bg={"#FED2E2"} onPress={signOut}>
-            Logout
+            로그아웃
           </Button>
         </Sheet.Frame>
       </Sheet>

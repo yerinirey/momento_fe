@@ -59,7 +59,7 @@ export default function Home() {
       <HomeSuggestions />
       <YStack bg={"white"} w={"100%"} p={20} gap={20}>
         <Text als={"flex-start"} fos={20} fow={"bold"}>
-          {session ? "Trending things" : "Sign in for your best experience"}
+          {session ? "Trending things" : "로그인하고 모멘토를 둘러보세요."}
         </Text>
         {session ? (
           <XStack gap={30} jc={"space-between"} fw={"wrap"}>
@@ -72,7 +72,7 @@ export default function Home() {
             ))}
           </XStack>
         ) : (
-          <DefaultButton onPress={onClickAuth}>Sign in</DefaultButton>
+          <DefaultButton onPress={onClickAuth}>로그인</DefaultButton>
         )}
       </YStack>
     </ScrollView>

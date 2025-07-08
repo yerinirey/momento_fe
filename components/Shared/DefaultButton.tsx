@@ -18,8 +18,8 @@ export function DefaultButton({
       h={50}
       br={50}
       textProps={{ fos: 18 }}
-      bg={variant === "primary" ? "$yellow10Light" : "white"}
-      bc={variant === "primary" ? "$yellow10Light" : "gray"}
+      bg={variant === "primary" ? "#FED2E2" : "white"}
+      bc={variant === "primary" ? "#E9A5F1" : "#FED2E2"}
       {...props}
     >
       {children}

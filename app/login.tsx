@@ -4,7 +4,7 @@ import { supabase } from "@/supabase";
 import Icon from "@expo/vector-icons/Ionicons";
 import { router, useNavigation } from "expo-router";
 import { useEffect, useState } from "react";
-import { Alert, Dimensions, Pressable } from "react-native";
+import { Alert, Pressable } from "react-native";
 import { Checkbox, Form, Input, Label, Text, XStack, YStack } from "tamagui";
 
 enum Step {
@@ -65,12 +65,12 @@ export default function Login() {
   return (
     <YStack f={1} ai={"center"} p={20} gap={20} bg={"white"}>
       <Text als={"flex-start"} fos={20} fow={"bold"}>
-        Sign in {step === Step.EMAIL && "or create an account"}
+        로그인 {step === Step.EMAIL && "하거나 계정을 생성하세요."}
       </Text>
       <Form w={"100%"} gap={20}>
         {step === Step.EMAIL ? (
           <Label als={"flex-start"} fos={16} fow={"bold"}>
-            Enter Email
+            이메일 입력
           </Label>
         ) : (
           <XStack gap={10} ai={"center"}>
@@ -79,7 +79,7 @@ export default function Login() {
             </Text>
             <Pressable onPress={() => setStep(Step.EMAIL)}>
               <Text fos={16} textDecorationLine="underline" color={"#146eb4"}>
-                Change
+                이메일 변경하기
               </Text>
             </Pressable>
           </XStack>
@@ -138,9 +138,9 @@ export default function Login() {
           else login();
         }}
       >
-        {step === Step.EMAIL ? "Continue" : "Sign In"}
+        {step === Step.EMAIL ? "다음" : "로그인"}
       </DefaultButton>
-      <XStack w={"100%"} ai={"center"} jc={"center"}>
+      {/* <XStack w={"100%"} ai={"center"} jc={"center"}>
         <Text>By continuing, you agree to Amazon;s </Text>
         <Text textDecorationLine="underline" color={"#146eb4"}>
           Conditions
@@ -170,7 +170,7 @@ export default function Login() {
         <Text color={"gray"} fos={14}>
           ⓒ 1996-2021, Amazon.com, Inc. or its affiliates
         </Text>
-      </YStack>
+      </YStack> */}
     </YStack>
   );
 }

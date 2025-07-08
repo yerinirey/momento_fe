@@ -13,8 +13,9 @@ const AppLayout = () => {
 
   useEffect(() => {
     if (loading) return;
-    if (!session) router.replace("/login");
-    else router.replace("/(tabs)");
+    // if (!session) router.replace("/login");
+    // else router.replace("/(tabs)");
+    router.replace("/(tabs)");
   }, [session, loading]);
 
   return (

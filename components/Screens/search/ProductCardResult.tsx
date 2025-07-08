@@ -38,7 +38,7 @@ export function ProductCardResult({ product, onPress }: Props) {
             h={40}
             textProps={{ fos: 14 }}
           >
-            {isBookmarked ? "Remove Bookmark" : "Add Bookmark"}
+            {isBookmarked ? "저장 취소" : "내 모멘토에 저장"}
           </DefaultButton>
         </YStack>
       </XStack>
