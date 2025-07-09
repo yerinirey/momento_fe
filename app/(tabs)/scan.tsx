@@ -1,37 +1,31 @@
-import {
-  View,
-  Text,
-  Button,
-  Image,
-  ScrollView,
-  Alert,
-  Linking,
-} from "react-native";
+import { View, Text, Image, ScrollView, Alert, Linking } from "react-native";
 import React, { useEffect, useState } from "react";
 import * as ImagePicker from "expo-image-picker";
 import { Camera, CameraType } from "expo-camera";
 import { Stack, router, useLocalSearchParams } from "expo-router";
-import { YStack, XStack } from "tamagui";
+import { YStack, XStack, Button } from "tamagui";
 import { H2, Paragraph } from "tamagui";
 import { useModelGeneration } from "../../context/ModelGenerationProvider";
-
 export default function ScanScreen() {
   const [selectedImages, setSelectedImages] = useState<string[]>([]);
   const { addGeneratingModel } = useModelGeneration();
   const params = useLocalSearchParams();
   const capturedUrisParam = params?.capturedUris;
-  console.log(capturedUrisParam);
   // 🔄 촬영 결과를 반영
   useEffect(() => {
-    if (capturedUrisParam && typeof capturedUrisParam === "string") {
+    if (
+      capturedUrisParam &&
+      typeof capturedUrisParam === "string" &&
+      capturedUrisParam !== "undefined"
+    ) {
       try {
-        const decoded = decodeURIComponent(capturedUrisParam);
+        // const decoded = decodeURIComponent(capturedUrisParam);
         const uris = JSON.parse(capturedUrisParam) as string[];
         if (Array.isArray(uris)) {
           setSelectedImages((prev) => [...prev, ...uris]);
         }
       } catch (e) {
-        console.error("capturedUris 파싱 실패:", e);
+        console.error("파싱 실패:", e, capturedUrisParam);
       }
     }
     router.setParams({ capturedUris: undefined });
@@ -57,6 +51,7 @@ export default function ScanScreen() {
   const generateModel = () => {
     if (selectedImages.length > 0) {
       addGeneratingModel(selectedImages[0]);
+      setSelectedImages([]);
       router.navigate("/profile");
     } else {
       alert("Please select or capture images first.");
@@ -64,20 +59,26 @@ export default function ScanScreen() {
   };
 
   return (
-    <YStack flex={1} jc="center" ai="center" p="10%">
+    <YStack flex={1} p="8%">
       <Stack.Screen options={{ title: "Scan" }} />
       <Text>Scan for 3D Model</Text>
 
-      <XStack mb="$4">
-        <Button title="Pick Images from Gallery" onPress={pickImage} />
-        <Button
-          title="Open Camera"
-          onPress={() => router.push("/scan/camera")}
-        />
+      <XStack mb={"10"}>
+        <Button onPress={pickImage}>갤러리에서 사진 선택</Button>
+        <Button onPress={() => router.push("/scan/camera")}>
+          멀티뷰 이미지 촬영
+        </Button>
       </XStack>
 
       {selectedImages.length > 0 && (
-        <YStack width="100%" marginBottom="$4">
+        <YStack
+          width="100%"
+          mb="10"
+          borderWidth={1}
+          borderColor="$gray8"
+          p={"10"}
+          br={10}
+        >
           <Paragraph>Selected Images:</Paragraph>
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             {selectedImages.map((uri, index) => (
@@ -88,11 +89,18 @@ export default function ScanScreen() {
               />
             ))}
           </ScrollView>
+          {selectedImages.length > 0 && (
+            <Button onPress={() => setSelectedImages([])} color="red">
+              초기화
+            </Button>
+          )}
         </YStack>
       )}
 
       {selectedImages.length > 0 && (
-        <Button title="Generate Model" onPress={generateModel} />
+        <>
+          <Button onPress={generateModel}>모멘토 생성</Button>
+        </>
       )}
     </YStack>
   );

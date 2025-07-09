@@ -5,6 +5,7 @@ import { Alert, Linking, StyleSheet } from "react-native";
 import { Button, Image, ScrollView, Text, View } from "tamagui";
 import Icon from "@expo/vector-icons/Ionicons";
 import TiltIndicator from "@/components/Camera/TiltIndicator";
+import { CameraSceneButton } from "@/components/Shared/CameraSceneButton";
 
 export default function CameraScreen() {
   const cameraRef = React.useRef<CameraView>(null);
@@ -77,18 +78,22 @@ export default function CameraScreen() {
             flash="off"
             animateShutter
           />
-          <TiltIndicator />
+          {/* <TiltIndicator /> */}
 
           <View style={styles.counterContainer}>
             <Text style={styles.counterText}>{capturedUris.length} / 10</Text>
           </View>
           <View style={styles.controls}>
-            <Button
+            <CameraSceneButton onPress={handleDone} iconName="checkmark" />
+            <CameraSceneButton
               onPress={takePhoto}
-              icon={<Icon name="camera-outline" size={24} />}
+              iconName="camera-outline"
+              bgColor="#FED2E2"
             />
-            <Button onPress={handleDone}>✅ 완료</Button>
-            <Button onPress={() => router.back()}>❌ 취소</Button>
+            <CameraSceneButton
+              onPress={() => router.back()}
+              iconName="close-outline"
+            />
           </View>
           {capturedUris.length > 0 && (
             <ScrollView
