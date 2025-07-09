@@ -5,6 +5,7 @@ import { supabase } from "@/supabase";
 import Icon from "@expo/vector-icons/Ionicons";
 import { router, useNavigation } from "expo-router";
 import { useEffect, useState } from "react";
+import { useModelGeneration } from "@/context/ModelGenerationProvider";
 import { Pressable } from "react-native";
 import {
   Avatar,
@@ -19,6 +20,7 @@ import {
 
 export default function Profile() {
   const { session } = useAuth();
+  const { generatingModels } = useModelGeneration();
   const onClickAuth = () => {
     router.push("/login");
   };
@@ -74,6 +76,40 @@ export default function Profile() {
             {/* <ProfileUnauthedBanner /> */}
           </YStack>
         )}
+        <YStack p={20} gap={20}>
+          <Text fos={20} fow={"bold"}>
+            My Models
+          </Text>
+          {generatingModels.length === 0 ? (
+            <Text ta="center" color="$gray8">
+              생성한 모멘토가 없습니다.
+            </Text>
+          ) : (
+            generatingModels.map((model) => (
+              <YStack
+                key={model.id}
+                bg={"#f0f0f0"}
+                borderRadius={10}
+                p={15}
+                ai={"center"}
+                gap={10}
+              >
+                <Image
+                  source={{ uri: model.thumbnailUri }}
+                  width={100}
+                  height={100}
+                  borderRadius={5}
+                />
+                <Text fos={16} fow={"bold"}>
+                  모멘토 생성중
+                </Text>
+                <Text fos={14} color={"gray"}>
+                  생성이 완료되면 알려드릴게요.
+                </Text>
+              </YStack>
+            ))
+          )}
+        </YStack>
       </ScrollView>
       <Sheet
         modal

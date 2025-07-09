@@ -1,6 +1,7 @@
 import { Header } from "@/components/Shared/header/Header";
 import { AuthProvider, useAuth } from "@/context/AuthProvider";
 import { BookmarkProvider } from "@/context/BookmarkProvider";
+import { ModelGenerationProvider } from "@/context/ModelGenerationProvider";
 import tamaguiConfig from "@/tamagui.config";
 import { router, Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
@@ -39,14 +40,16 @@ export default function RootLayout() {
   return (
     <AuthProvider>
       <BookmarkProvider>
-        <TamaguiProvider config={tamaguiConfig}>
-          <PortalProvider>
-            <StatusBar style="auto" />
-            <Theme>
-              <AppLayout />
-            </Theme>
-          </PortalProvider>
-        </TamaguiProvider>
+        <ModelGenerationProvider>
+          <TamaguiProvider config={tamaguiConfig}>
+            <PortalProvider>
+              <StatusBar style="auto" />
+              <Theme>
+                <AppLayout />
+              </Theme>
+            </PortalProvider>
+          </TamaguiProvider>
+        </ModelGenerationProvider>
       </BookmarkProvider>
     </AuthProvider>
   );

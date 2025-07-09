@@ -6,7 +6,7 @@ import { Text, XStack, YStack } from "tamagui";
 
 interface Tab {
   name: string;
-  icon: "home-outline" | "account-outline" | "bookmark-outline";
+  icon: "home-outline" | "account-outline" | "bookmark-outline" | "camera-outline";
 }
 export default function TabLayout() {
   const { bookmarkedItems } = useBookmark();
@@ -14,6 +14,10 @@ export default function TabLayout() {
     {
       name: "index",
       icon: "home-outline",
+    },
+    {
+      name: "scan",
+      icon: "camera-outline",
     },
     {
       name: "profile",
