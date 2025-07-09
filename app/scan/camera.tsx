@@ -77,9 +77,9 @@ export default function CameraScreen() {
             flash="off"
             animateShutter
           />
+          <TiltIndicator />
 
           <View style={styles.counterContainer}>
-            <TiltIndicator />
             <Text style={styles.counterText}>{capturedUris.length} / 10</Text>
           </View>
           <View style={styles.controls}>
