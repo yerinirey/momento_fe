@@ -4,6 +4,8 @@ import React, { useEffect, useState } from "react";
 import { Alert, Linking, StyleSheet } from "react-native";
 import { Button, Image, ScrollView, Text, View } from "tamagui";
 import Icon from "@expo/vector-icons/Ionicons";
+import TiltIndicator from "@/components/Camera/TiltIndicator";
+
 export default function CameraScreen() {
   const cameraRef = React.useRef<CameraView>(null);
   const [cameraPermission, requestCameraPermission] = useCameraPermissions();
@@ -75,7 +77,9 @@ export default function CameraScreen() {
             flash="off"
             animateShutter
           />
+
           <View style={styles.counterContainer}>
+            <TiltIndicator />
             <Text style={styles.counterText}>{capturedUris.length} / 10</Text>
           </View>
           <View style={styles.controls}>
