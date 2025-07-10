@@ -2,6 +2,7 @@ import useControls from "r3f-native-orbitcontrols";
 import { Canvas } from "@react-three/fiber/native";
 import { Suspense, useEffect, useState } from "react";
 import { ActivityIndicator } from "react-native";
+// import { OrbitControls } from "@react-three/drei/native";
 import Model from "../3dModel/Model";
 import { View } from "tamagui";
 type ModelProps = {
@@ -15,7 +16,7 @@ export default function ModelView({ modelUrl }: ModelProps) {
   useEffect(() => {
     const timer = setTimeout(() => {
       setCanLoad(true);
-    }, 5000); // 5초 후 로딩 허용
+    }, 3000); // 5초 후 로딩 허용
 
     return () => clearTimeout(timer);
   }, []);
@@ -33,7 +34,7 @@ export default function ModelView({ modelUrl }: ModelProps) {
             <directionalLight position={[-1, 0, 0]} args={["white", 2]} />
             <directionalLight position={[0, 0, 1]} args={["white", 2]} />
             <directionalLight position={[0, 0, -1]} args={["white", 2]} />
-            <directionalLight position={[0, 1, 0]} args={["white", 15]} />
+            <directionalLight position={[0, 1, 0]} args={["white", 6]} />
             <directionalLight position={[0, -1, 0]} args={["white", 2]} />
             <Suspense>
               <Model modelUrl={modelUrl} />
