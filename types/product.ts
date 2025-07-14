@@ -4,4 +4,5 @@ export interface Product {
   imageUrl?: string | null;
   model3DUrl?: string | null;
   created_at: string;
-  }
+  descriptions: string;
+}

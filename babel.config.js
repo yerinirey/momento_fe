@@ -13,7 +13,7 @@ module.exports = function (api) {
         },
       ],
       "react-native-reanimated/plugin",
-      //   ["react-native-worklets-core/plugin", { processNestedWorklets: true }],
+      ["react-native-worklets-core/plugin", { processNestedWorklets: true }],
     ],
   };
 };

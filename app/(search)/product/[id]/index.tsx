@@ -40,7 +40,10 @@ export default function ProductScreen() {
   return (
     <>
       <ScrollView f={1} gap={20} bg={"white"} p={20}>
-        <Text color={"$color.gray8Dark"}>{product.name}</Text>
+        <Text color={"$color.gray8Dark"} fontWeight={"bold"} fontSize={24}>
+          {product.name}
+        </Text>
+        <Text>{product.created_at.split("T")[0]}</Text>
         <Image
           source={{ uri: product.imageUrl ?? "" }}
           h={300}
@@ -71,7 +74,7 @@ export default function ProductScreen() {
             </>
           )}
         </XStack>
-        <Text>Text</Text>
+        <Text>{product.descriptions}</Text>
 
         <YStack gap={20} mb={30}>
           <DefaultButton

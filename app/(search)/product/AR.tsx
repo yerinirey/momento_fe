@@ -1,67 +1,71 @@
-// import {
-//   ViroARScene,
-//   ViroARSceneNavigator,
-//   Viro3DObject,
-//   ViroARPlane,
-//   ViroAmbientLight,
-//   ViroMaterials,
-//   ViroQuad,
-// } from "@reactvision/react-viro";
-// import { View } from "react-native";
+import {
+  ViroARScene,
+  ViroARSceneNavigator,
+  Viro3DObject,
+  ViroARPlane,
+  ViroAmbientLight,
+  ViroMaterials,
+  ViroQuad,
+} from "@reactvision/react-viro";
 import { useLocalSearchParams } from "expo-router";
 import { Text } from "tamagui";
+import { useState } from "react";
+import { Viro3DPoint } from "@reactvision/react-viro/dist/components/Types/ViroUtils";
 
-// // ✅ 재질 정의 (광원 무시하는 평면 재질)
-// ViroMaterials.createMaterials({
-//   quad: {
-//     lightingModel: "Constant",
-//     diffuseColor: "#aaaaaa",
-//   },
-// });
+// 재질 정의 (광원 무시하는 평면 재질)
+ViroMaterials.createMaterials({
+  quad: {
+    lightingModel: "Constant",
+    diffuseColor: "#aaaaaa",
+  },
+});
 
-// // ✅ AR 씬 정의
-// function MyARScene({ modelUrl }: { modelUrl: string }) {
-//   const [position, setPosition] = useState<[number, number, number] | null>(
-//     null
-//   );
+// AR 씬 정의
+function Scene({ modelUrl }: { modelUrl: string }) {
+  const [position, setPosition] = useState<Viro3DPoint | null>(null);
 
-//   return (
-//     <ViroARScene>
-//       <ViroAmbientLight color="white" />
-
-//       <ViroARPlane dragType="FixedToWorld">
-//         {/* 3D 오브젝트: 클릭 위치에 배치 */}
-//         <Viro3DObject
-//           visible={!!position}
-//           position={position ?? [0, 0, 0]}
-//           scale={[0.1, 0.1, 0.1]}
-//           source={{ uri: modelUrl }}
-//           type="GLB"
-//           // dragType="FixedToWorld"
-//         />
-
-//         {/* 바닥 평면: 클릭 위치 지정용 */}
-//         <ViroQuad
-//           visible={!position}
-//           position={[0, 0, 0]}
-//           width={1}
-//           height={1}
-//           rotation={[-90, 0, 0]}
-//           materials="quad"
-//           onClickState={(state, pos) => {
-//             if (state === 2) {
-//               setPosition(pos);
-//             }
-//           }}
-//         />
-//       </ViroARPlane>
-//     </ViroARScene>
-//   );
-// }
+  return (
+    <ViroARScene>
+      {/* 기본적인 광원, 씬 전체에 적용 */}
+      <ViroAmbientLight color="white" />
+      {/*  드래그 기능 */}
+      <ViroARPlane dragType="FixedToWorld">
+        <Viro3DObject
+          visible={!!position} // 클릭 시 보이도록 설정
+          source={{ uri: modelUrl }}
+          position={position ?? [0, 0, 0]}
+          scale={[1, 1, 1]}
+          type="GLB"
+          onDrag={() => {}}
+        />
+        <ViroQuad
+          visible={!position} // 클릭하지 않았을 때 보이도록 설정
+          position={[0, 0, 0]}
+          width={1}
+          height={1}
+          rotation={[-90, 0, 0]}
+          materials="QuadMaterial"
+          onClickState={(state, position) => {
+            if (state === "CLICKED") {
+              setPosition(position);
+            }
+          }}
+        />
+      </ViroARPlane>
+    </ViroARScene>
+  );
+}
 
 // // ✅ ARScreen 컴포넌트: ViroARSceneNavigator 사용
 export default function ARScreen() {
   const { modelUrl } = useLocalSearchParams<{ modelUrl: string }>();
 
-  return <Text>{modelUrl}</Text>;
+  return (
+    <>
+      <Text>{modelUrl}</Text>
+      <ViroARSceneNavigator
+        initialScene={{ scene: () => <Scene modelUrl={modelUrl} /> }}
+      />
+    </>
+  );
 }

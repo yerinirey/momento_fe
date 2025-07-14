@@ -10,44 +10,47 @@ type ModelProps = {
 };
 
 export default function ModelView({ modelUrl }: ModelProps) {
-  const [canLoad, setCanLoad] = useState(false);
   const [OrbitControls, events] = useControls();
+  // const [canLoad, setCanLoad] = useState(false);
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setCanLoad(true);
-    }, 3000); // 5초 후 로딩 허용
+  // useEffect(() => {
+  //   const timer = setTimeout(() => {
+  //     setCanLoad(true);
+  //   }, 3000); // 5초 후 로딩 허용
 
-    return () => clearTimeout(timer);
-  }, []);
+  //   return () => clearTimeout(timer);
+  // }, []);
 
   return (
     <>
-      {canLoad ? (
-        <View style={{ flex: 1 }} {...events}>
+      {/* {canLoad ? ( */}
+      <View style={{ flex: 1 }} {...events}>
+        <Suspense
+          fallback={<ActivityIndicator size={"large"} color={"white"} />}
+        >
           <Canvas
-            style={{ flex: 1, backgroundColor: "brown" }}
+            style={{ flex: 1, backgroundColor: "black" }}
             frameloop="demand"
           >
             <OrbitControls />
             <directionalLight position={[1, 0, 0]} args={["white", 2]} />
             <directionalLight position={[-1, 0, 0]} args={["white", 2]} />
-            <directionalLight position={[0, 0, 1]} args={["white", 2]} />
+            {/* <directionalLight position={[0, 0, 1]} args={["white", 2]} /> */}
             <directionalLight position={[0, 0, -1]} args={["white", 2]} />
-            <directionalLight position={[0, 1, 0]} args={["white", 6]} />
+            {/* <directionalLight position={[0, 1, 0]} args={["white", 6]} /> */}
             <directionalLight position={[0, -1, 0]} args={["white", 2]} />
-            <Suspense>
-              <Model modelUrl={modelUrl} />
-            </Suspense>
+
+            <Model modelUrl={modelUrl} />
           </Canvas>
-        </View>
-      ) : (
+        </Suspense>
+      </View>
+      {/* ) : (
         <ActivityIndicator
           size="large"
           color="white"
           style={{ flex: 1, backgroundColor: "black" }}
         />
-      )}
+      )} */}
     </>
   );
 }
