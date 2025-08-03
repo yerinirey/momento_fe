@@ -8,7 +8,6 @@ import {
 } from "@react-navigation/native-stack";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { XStack, YStack } from "tamagui";
-import { GradientBackground } from "../GradientBackground";
 import { HeaderSearch } from "./HeaderSearch";
 import { HeaderTabs, HeaderTabsProps } from "./HeaderTabs";
 
@@ -49,12 +48,11 @@ export function Header({ options }: StackHeaderProps | TabsHeaderProps) {
             {options.headerRight && <options.headerRight />}
           </YStack>
         </XStack>
-        <GradientBackground />
       </YStack>
     );
   }
   return (
-    <YStack bg="$colorTransparent">
+    <YStack bg="$pointColor">
       <YStack
         bg="$colorTransparent"
         gap={20}
@@ -64,7 +62,6 @@ export function Header({ options }: StackHeaderProps | TabsHeaderProps) {
         {options.headerSearchShown && <HeaderSearch />}
         {options.headerTabsProps && <HeaderTabs {...options.headerTabsProps} />}
       </YStack>
-      <GradientBackground />
     </YStack>
   );
 }

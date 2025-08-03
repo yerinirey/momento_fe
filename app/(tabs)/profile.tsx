@@ -78,12 +78,10 @@ export default function Profile() {
         )}
         <YStack p={20} gap={20}>
           <Text fos={20} fow={"bold"}>
-            My Models
+            내 모멘토
           </Text>
           {generatingModels.length === 0 ? (
-            <Text ta="center" color="$gray8">
-              생성한 모멘토가 없습니다.
-            </Text>
+            <Text color="$gray10">생성한 모멘토가 없습니다.</Text>
           ) : (
             generatingModels.map((model) => (
               <YStack

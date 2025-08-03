@@ -14,7 +14,7 @@ export default function Cart() {
   const tabs: HeaderTabsProps["tabs"] = [
     {
       active: true,
-      title: "Bookmarks",
+      title: "북마크",
       onPress: () => Alert.alert("Bookmarks"),
     },
   ];
@@ -25,20 +25,20 @@ export default function Cart() {
       headerTabsProps: { tabs },
     });
   }, [navigation.setOptions]);
-
   return (
     <ScrollView f={1} bg={"white"} contentContainerStyle={{ pb: 20 }}>
-      <YStack f={1} jc={"center"} ai={"center"} gap={20} px={20} pt={10}>
+      <YStack f={1} gap={20} px={16} pt={20}>
+        <Text fos={20} fow={"bold"}>
+          저장
+        </Text>
         {bookmarkedItems.length ? (
           bookmarkedItems.map((item) => (
             <ProductCart key={item.id} product={item} />
           ))
         ) : (
           <>
-            <Icon marginTop={10} name="bookmarks" size={140} />
-            <Text fow={"bold"} fos={26}>
-              저장한 모멘토가 없습니다.
-            </Text>
+            {/* <Icon marginTop={10} name="bookmarks" size={20} /> */}
+            <Text color="$gray10">저장한 모멘토가 없습니다.</Text>
           </>
         )}
       </YStack>

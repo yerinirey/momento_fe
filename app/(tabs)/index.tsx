@@ -20,15 +20,15 @@ export default function Home() {
   const tabs: HeaderTabsProps["tabs"] = [
     {
       active: true,
-      title: "Home",
+      title: "홈",
       onPress: () => Alert.alert("Home"),
     },
     {
-      title: "Trend",
+      title: "트렌드",
       onPress: () => Alert.alert("Trend"),
     },
     {
-      title: "New",
+      title: "더보기",
       onPress: () => Alert.alert("New"),
     },
   ];
@@ -56,23 +56,57 @@ export default function Home() {
   return (
     <ScrollView f={1}>
       {/* <HomeCarousel /> */}
-      <HomeSuggestions />
-      <YStack bg={"white"} w={"100%"} p={20} gap={20}>
-        <Text als={"flex-start"} fos={20} fow={"bold"}>
-          {session ? "Trending things" : "로그인하고 모멘토를 둘러보세요."}
-        </Text>
+      {/* <HomeSuggestions /> */}
+      <YStack bg={"white"} w={"100%"} p={16} pt={20} gap={10}>
         {session ? (
-          <XStack gap={30} jc={"space-between"} fw={"wrap"}>
-            {trends.map((product) => (
-              <ProductDealCard
-                key={product.id}
-                product={product}
-                onPress={() => onProductPress(product)}
-              />
-            ))}
-          </XStack>
+          // 임시로 칸을 나눠두기. 카테고리로 추가할 예정인 항목
+          <>
+            <Text als={"flex-start"} fos={20} fow={"bold"}>
+              바다
+            </Text>
+            <XStack gap={30} jc={"space-between"} fw={"wrap"}>
+              {trends.slice(0, 2).map((product) => (
+                <ProductDealCard
+                  key={product.id}
+                  product={product}
+                  onPress={() => onProductPress(product)}
+                />
+              ))}
+            </XStack>
+            <YStack borderBottomWidth={1} borderColor="#c58efd69" />
+            <Text als={"flex-start"} fos={20} fow={"bold"}>
+              피규어
+            </Text>
+            <XStack gap={30} jc={"space-between"} fw={"wrap"}>
+              {trends.slice(2, 4).map((product) => (
+                <ProductDealCard
+                  key={product.id}
+                  product={product}
+                  onPress={() => onProductPress(product)}
+                />
+              ))}
+            </XStack>
+            <YStack borderBottomWidth={1} borderColor="#c58efd69" />
+            <Text als={"flex-start"} fos={20} fow={"bold"}>
+              내 인형
+            </Text>
+            <XStack gap={0} jc={"space-between"} fw={"wrap"}>
+              {trends.slice(4).map((product) => (
+                <ProductDealCard
+                  key={product.id}
+                  product={product}
+                  onPress={() => onProductPress(product)}
+                />
+              ))}
+            </XStack>
+          </>
         ) : (
-          <DefaultButton onPress={onClickAuth}>로그인</DefaultButton>
+          <>
+            <Text als={"flex-start"} fos={20} fow={"bold"}>
+              로그인하고 모멘토를 둘러보세요.
+            </Text>
+            <DefaultButton onPress={onClickAuth}>로그인</DefaultButton>
+          </>
         )}
       </YStack>
     </ScrollView>

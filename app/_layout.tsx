@@ -12,7 +12,7 @@ import { TamaguiProvider, Theme } from "@tamagui/core";
 
 const AppLayout = () => {
   const { session, loading } = useAuth();
-
+  // console.log(session);
   useEffect(() => {
     if (loading) return;
     // if (!session) router.replace("/login");

@@ -16,10 +16,10 @@ export function DefaultButton({
     <Button
       onPress={onPress}
       h={50}
-      br={50}
+      br={10}
       textProps={{ fos: 18 }}
-      bg={variant === "primary" ? "#FED2E2" : "white"}
-      bc={variant === "primary" ? "#E9A5F1" : "#FED2E2"}
+      bg={variant === "primary" ? "white" : "white"}
+      bc={variant === "primary" ? "$pointColor" : "grey"}
       {...props}
     >
       {children}

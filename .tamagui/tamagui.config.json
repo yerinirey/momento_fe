@@ -39283,6 +39283,13 @@
           "name": "c-yellow12Dark",
           "val": "hsl(53, 100%, 91.0%)",
           "variable": ""
+        },
+        "pointColor": {
+          "isVar": true,
+          "key": "$pointColor",
+          "name": "c-color-pointColor",
+          "val": "#C68EFD",
+          "variable": ""
         }
       },
       "radius": {
@@ -41709,6 +41716,13 @@
         "key": "$yellow12Dark",
         "name": "c-yellow12Dark",
         "val": "hsl(53, 100%, 91.0%)",
+        "variable": ""
+      },
+      "$color.pointColor": {
+        "isVar": true,
+        "key": "$pointColor",
+        "name": "c-color-pointColor",
+        "val": "#C68EFD",
         "variable": ""
       },
       "$radius.0": {

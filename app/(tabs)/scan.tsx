@@ -1,11 +1,12 @@
-import { View, Text, Image, ScrollView, Alert, Linking } from "react-native";
+import { View, Image, ScrollView, Alert, Linking } from "react-native";
 import React, { useEffect, useState } from "react";
 import * as ImagePicker from "expo-image-picker";
 import { Camera, CameraType } from "expo-camera";
 import { Stack, router, useLocalSearchParams } from "expo-router";
-import { YStack, XStack, Button } from "tamagui";
+import { YStack, XStack, Button, Text } from "tamagui";
 import { H2, Paragraph } from "tamagui";
 import { useModelGeneration } from "../../context/ModelGenerationProvider";
+import { DefaultButton } from "@/components/Shared/DefaultButton";
 export default function ScanScreen() {
   const [selectedImages, setSelectedImages] = useState<string[]>([]);
   const { addGeneratingModel } = useModelGeneration();
@@ -59,15 +60,22 @@ export default function ScanScreen() {
   };
 
   return (
-    <YStack flex={1} p="8%">
+    <YStack bg={"white"} flex={1} p="8%" gap={20} px={16} pt={20}>
       <Stack.Screen options={{ title: "Scan" }} />
-      <Text>Scan for 3D Model</Text>
+      <Text fos={20} fow={"bold"}>
+        3D 모델 생성
+      </Text>
 
-      <XStack mb={"10"}>
-        <Button onPress={pickImage}>갤러리에서 사진 선택</Button>
-        <Button onPress={() => router.push("/scan/camera")}>
+      <XStack jc={"space-between"} mb={"10"}>
+        <DefaultButton textProps={{ fos: 14 }} onPress={pickImage}>
+          갤러리에서 사진 선택
+        </DefaultButton>
+        <DefaultButton
+          textProps={{ fos: 14 }}
+          onPress={() => router.push("/scan/camera")}
+        >
           멀티뷰 이미지 촬영
-        </Button>
+        </DefaultButton>
       </XStack>
 
       {selectedImages.length > 0 && (
@@ -79,7 +87,7 @@ export default function ScanScreen() {
           p={"10"}
           br={10}
         >
-          <Paragraph>Selected Images:</Paragraph>
+          <Paragraph>선택된 이미지 ({selectedImages.length}장) </Paragraph>
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             {selectedImages.map((uri, index) => (
               <Image
@@ -90,7 +98,11 @@ export default function ScanScreen() {
             ))}
           </ScrollView>
           {selectedImages.length > 0 && (
-            <Button onPress={() => setSelectedImages([])} color="red">
+            <Button
+              bg={"$colorTransparent"}
+              onPress={() => setSelectedImages([])}
+              color="red"
+            >
               초기화
             </Button>
           )}
@@ -99,7 +111,7 @@ export default function ScanScreen() {
 
       {selectedImages.length > 0 && (
         <>
-          <Button onPress={generateModel}>모멘토 생성</Button>
+          <DefaultButton onPress={generateModel}>모멘토 생성</DefaultButton>
         </>
       )}
     </YStack>

@@ -43,38 +43,36 @@ export default function ProductScreen() {
         <Text color={"$color.gray8Dark"} fontWeight={"bold"} fontSize={24}>
           {product.name}
         </Text>
-        <Text>{product.created_at.split("T")[0]}</Text>
+        <Text>{product.created_at.split("T")[0]} 생성</Text>
         <Image
           source={{ uri: product.imageUrl ?? "" }}
           h={300}
           objectFit="contain"
         />
-        <XStack jc={"space-between"} my={20}>
+        <Text fos={16}>{product.descriptions}</Text>
+        <XStack jc={"flex-start"} gap={10} my={20}>
           {product.model3DUrl && (
             <>
               {["THREED", "AR"].map((viewType) => (
                 <Button
                   key={viewType}
                   bw={1}
-                  br={50}
-                  bc={"#0e4db3"}
-                  variant="outlined"
-                  textProps={{ color: "#0e4db3", fos: 13 }}
+                  br={10}
+                  bg={"$pointColor"}
+                  textProps={{ color: "black", fos: 14 }}
                   onPress={() => onViewType(viewType as "THREED" | "AR")}
-                  // onPress={() => onViewType(viewType as "AR")}
                 >
-                  <MCIcon
+                  {/* <MCIcon
                     name="arrow-u-left-bottom"
                     size={20}
-                    color="#0e4db3"
-                  />
-                  {viewType === "THREED" ? "VIEW IN 3D" : "VIEW IN YOUR ROOM"}
+                    color="$pointColor"
+                  /> */}
+                  {viewType === "THREED" ? "3D" : "AR"}
                 </Button>
               ))}
             </>
           )}
         </XStack>
-        <Text>{product.descriptions}</Text>
 
         <YStack gap={20} mb={30}>
           <DefaultButton

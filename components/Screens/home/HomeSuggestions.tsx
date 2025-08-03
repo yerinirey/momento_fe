@@ -43,7 +43,7 @@ export function HomeSuggestions() {
           </YStack>
         ))}
       </ScrollView>
-      <GradientBackground type="card" />
+      {/* <GradientBackground type="card" /> */}
     </YStack>
   );
 }

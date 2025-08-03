@@ -69,7 +69,7 @@ export function HeaderSearch() {
           placeholder="Search"
           // pointerEvents={isSearchScreen ? "auto" : "none"}
         />
-        <Icon name="scan" color={"black"} size={24} />
+        {/* <Icon name="scan" color={"black"} size={24} /> */}
       </XStack>
     </XStack>
   );

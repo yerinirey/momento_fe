@@ -28,21 +28,26 @@ export default function Login() {
 
   const onGoBack = () => router.back();
 
-  function register() {
-    supabase.auth
-      .signUp({ email, password })
-      .then(onGoBack)
-      .catch((err) => Alert.alert("Error", err.message));
+  async function signUp() {
+    const { error } = await supabase.auth.signUp({ email, password });
+    if (error) {
+      Alert.alert("회원가입 오류", error.message);
+    } else {
+      Alert.alert("성공", "회원가입을 완료하려면 이메일을 확인해주세요.");
+      onGoBack();
+    }
   }
 
-  function login() {
-    supabase.auth
-      .signInWithPassword({ email, password })
-      .then(({ error }) => {
-        if (error) return register();
-        else onGoBack();
-      })
-      .catch(register);
+  async function signIn() {
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    if (error) {
+      Alert.alert("로그인 오류", error.message);
+    } else {
+      onGoBack();
+    }
   }
 
   useEffect(() => {
@@ -127,19 +132,41 @@ export default function Login() {
         )}
       </Form>
 
-      <DefaultButton
-        w={"100%"}
-        disabled={email.length < 5}
-        disabledStyle={{
-          opacity: 0.5,
-        }}
-        onPress={() => {
-          if (step === Step.EMAIL) setStep(Step.PASSWORD);
-          else login();
-        }}
-      >
-        {step === Step.EMAIL ? "다음" : "로그인"}
-      </DefaultButton>
+      {step === Step.EMAIL ? (
+        <DefaultButton
+          w={"100%"}
+          disabled={email.length < 1}
+          disabledStyle={{
+            opacity: 0.5,
+          }}
+          onPress={() => setStep(Step.PASSWORD)}
+        >
+          다음
+        </DefaultButton>
+      ) : (
+        <>
+          <DefaultButton
+            w={"100%"}
+            disabled={password.length < 2}
+            disabledStyle={{
+              opacity: 0.5,
+            }}
+            onPress={signIn}
+          >
+            로그인
+          </DefaultButton>
+          <DefaultButton
+            w={"100%"}
+            disabled={password.length < 6}
+            disabledStyle={{
+              opacity: 0.5,
+            }}
+            onPress={signUp}
+          >
+            회원가입
+          </DefaultButton>
+        </>
+      )}
       {/* <XStack w={"100%"} ai={"center"} jc={"center"}>
         <Text>By continuing, you agree to Amazon;s </Text>
         <Text textDecorationLine="underline" color={"#146eb4"}>
