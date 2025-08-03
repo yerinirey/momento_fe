@@ -6,21 +6,14 @@ import {
   ViroAmbientLight,
   ViroMaterials,
   ViroQuad,
+  ViroClickStateTypes,
 } from "@reactvision/react-viro";
 import { useLocalSearchParams } from "expo-router";
 import { Text } from "tamagui";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Viro3DPoint } from "@reactvision/react-viro/dist/components/Types/ViroUtils";
 
-// 재질 정의 (광원 무시하는 평면 재질)
-ViroMaterials.createMaterials({
-  quad: {
-    lightingModel: "Constant",
-    diffuseColor: "#aaaaaa",
-  },
-});
-
-// AR 씬 정의
+// // AR 씬 정의
 function Scene({ modelUrl }: { modelUrl: string }) {
   const [position, setPosition] = useState<Viro3DPoint | null>(null);
 
@@ -46,7 +39,7 @@ function Scene({ modelUrl }: { modelUrl: string }) {
           rotation={[-90, 0, 0]}
           materials="QuadMaterial"
           onClickState={(state, position) => {
-            if (state === "CLICKED") {
+            if (state === ViroClickStateTypes.CLICKED) {
               setPosition(position);
             }
           }}
@@ -56,9 +49,18 @@ function Scene({ modelUrl }: { modelUrl: string }) {
   );
 }
 
-// // ✅ ARScreen 컴포넌트: ViroARSceneNavigator 사용
 export default function ARScreen() {
   const { modelUrl } = useLocalSearchParams<{ modelUrl: string }>();
+
+  useEffect(() => {
+    // 재질 정의 (광원 무시하는 평면 재질)
+    ViroMaterials.createMaterials({
+      QuadMaterial: {
+        lightingModel: "Constant",
+        diffuseColor: "#aaaaaa",
+      },
+    });
+  }, []);
 
   return (
     <>

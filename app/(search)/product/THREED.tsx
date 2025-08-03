@@ -1,4 +1,4 @@
-import ModelWebView from "@/components/3dModel/ModelWebView";
+// import ModelWebView from "@/components/3dModel/ModelWebView";
 import FloatingBackButton from "@/components/Shared/FloatingBackButton";
 import ModelView from "@/components/Shared/ModelView";
 import { router, useLocalSearchParams } from "expo-router";
