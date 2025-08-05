@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useGLTF } from "@react-three/drei/native";
 import { GLTF } from "three-stdlib";
 import { GroupProps } from "@react-three/fiber";
@@ -25,57 +25,38 @@ interface ModelProps extends GroupProps {
   modelUrl: string;
 }
 
-export default function Model(
-  // props: JSX.IntrinsicElements["group"] & {modelUrl: string}
-  { modelUrl, ...props }: ModelProps
-) {
-  const gltf = useGLTF(modelUrl);
-  const [readyScene, setReadyScene] = useState<THREE.Group | null>(null);
-
-  // material.name 없으면 발생하는 오류 겪음, 기본 이름을 설정해줘야 three 내부 오류 방지됨
+export default function Model({ modelUrl, ...props }: ModelProps) {
+  const { scene } = useGLTF(modelUrl);
+  const [ready, setReady] = useState(false);
+  const patched = useRef(false);
   useEffect(() => {
-    const scene = gltf.scene.clone(true);
+    if (patched.current) return;
 
     scene.traverse((child) => {
       if ((child as THREE.Mesh).isMesh) {
         const mesh = child as THREE.Mesh;
         const material = mesh.material;
 
-        if (!material) return;
-
         if (Array.isArray(material)) {
           material.forEach((m, i) => {
-            if (m && (!m.name || typeof m.name !== "string")) {
+            if (!m.name || typeof m.name !== "string") {
               m.name = `Material_${i}`;
             }
           });
         } else {
           if (!material.name || typeof material.name !== "string") {
-            material.name = "DefaultMaterial";
+            material.name = `DefaultMaterial`;
           }
         }
       }
     });
 
-    // material 배열도 방어
-    if (gltf.materials) {
-      Object.entries(gltf.materials).forEach(([key, material], idx) => {
-        if (!material.name || typeof material.name !== "string") {
-          material.name = `MaterialGlobal_${idx}`;
-        }
-      });
-    }
-
-    setReadyScene(scene);
-  }, [gltf]);
-  if (!readyScene) return null;
-  console.log(readyScene);
-  return (
-    <primitive
-      object={readyScene}
-      scale={7}
-      position={[0, -1.4, 0]}
-      {...props}
-    />
+    patched.current = true;
+    setReady(true);
+  }, [scene]);
+  return ready ? (
+    <primitive object={scene} scale={7} position={[0, -1.4, 0]} {...props} />
+  ) : (
+    <></>
   );
 }
