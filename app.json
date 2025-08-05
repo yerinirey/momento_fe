@@ -36,8 +36,7 @@
           "backgroundColor": "#ffffff"
         }
       ],
-      "expo-asset",
-      "@reactvision/react-viro"
+      "expo-asset"
     ],
     "experiments": {
       "typedRoutes": true

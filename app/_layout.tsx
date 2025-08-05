@@ -9,6 +9,7 @@ import { useEffect } from "react";
 import "react-native-reanimated";
 import { PortalProvider } from "tamagui";
 import { TamaguiProvider, Theme } from "@tamagui/core";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 const AppLayout = () => {
   const { session, loading } = useAuth();
@@ -38,19 +39,21 @@ const AppLayout = () => {
 
 export default function RootLayout() {
   return (
-    <AuthProvider>
-      <BookmarkProvider>
-        <ModelGenerationProvider>
-          <TamaguiProvider config={tamaguiConfig}>
-            <PortalProvider>
-              <StatusBar style="auto" />
-              <Theme>
-                <AppLayout />
-              </Theme>
-            </PortalProvider>
-          </TamaguiProvider>
-        </ModelGenerationProvider>
-      </BookmarkProvider>
-    </AuthProvider>
+    <GestureHandlerRootView>
+      <AuthProvider>
+        <BookmarkProvider>
+          <ModelGenerationProvider>
+            <TamaguiProvider config={tamaguiConfig}>
+              <PortalProvider>
+                <StatusBar style="auto" />
+                <Theme>
+                  <AppLayout />
+                </Theme>
+              </PortalProvider>
+            </TamaguiProvider>
+          </ModelGenerationProvider>
+        </BookmarkProvider>
+      </AuthProvider>
+    </GestureHandlerRootView>
   );
 }

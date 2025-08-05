@@ -12,7 +12,6 @@
     "@react-native-async-storage/async-storage": "1.23.1",
     "@react-three/drei": "^9.100.0",
     "@react-three/fiber": "^8.13.5",
-    "@reactvision/react-viro": "^2.43.3",
     "@supabase/supabase-js": "2.48.1",
     "@tamagui/babel-plugin": "1.121.11",
     "@tamagui/config": "1.121.11",
@@ -27,6 +26,8 @@
     "expo-sensors": "~14.0.2",
     "expo-splash-screen": "~0.29.24",
     "expo-status-bar": "~2.0.1",
+    "expo-system-ui": "~4.0.9",
+    "expo-three": "^8.0.0",
     "r3f-native-orbitcontrols": "^1.0.12",
     "react": "18.3.1",
     "react-native": "0.76.9",
@@ -35,10 +36,10 @@
     "react-native-reanimated": "3.16.1",
     "react-native-url-polyfill": "2.0.0",
     "react-native-webview": "13.12.5",
-    "react-native-worklets-core": "^1.5.0",
+    "react-native-worklets-core": "^1.6.0",
     "tamagui": "1.121.11",
-    "three": "^0.152.2",
-    "expo-system-ui": "~4.0.9"
+    "three": "^0.166.0",
+    "expo-file-system": "~18.0.12"
   },
   "devDependencies": {
     "@babel/core": "7.25.2",
