@@ -15,6 +15,7 @@ export default function SearchLayout() {
       <Stack.Screen name="product/[id]/index" />
       <Stack.Screen name="product/THREED" options={{ headerShown: false }} />
       <Stack.Screen name="product/AR" options={{ headerShown: false }} />
+      {/* <Stack.Screen name="product/WEBVIEW" options={{ headerShown: false }} /> */}
     </Stack>
   );
 }
