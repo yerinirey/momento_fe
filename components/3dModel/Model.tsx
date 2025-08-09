@@ -29,6 +29,7 @@ export default function Model({ modelUrl, ...props }: ModelProps) {
   const { scene } = useGLTF(modelUrl);
   const [ready, setReady] = useState(false);
   const patched = useRef(false);
+
   useEffect(() => {
     if (patched.current) return;
 
@@ -54,6 +55,7 @@ export default function Model({ modelUrl, ...props }: ModelProps) {
     patched.current = true;
     setReady(true);
   }, [scene]);
+
   return ready ? (
     <primitive object={scene} scale={7} position={[0, -1.4, 0]} {...props} />
   ) : (

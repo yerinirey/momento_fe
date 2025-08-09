@@ -28,18 +28,6 @@ export default function THREEDScreen() {
           </Suspense>
         </Canvas>
       </View>
-
-      <View style={styles.buttonContainer}>
-        <Pressable
-          style={styles.button}
-          onPress={() => {
-            console.log("?");
-            // navigation.goBack();
-          }}
-        >
-          <Text style={styles.textButton}>Buy Now</Text>
-        </Pressable>
-      </View>
     </SafeAreaView>
   );
 }
