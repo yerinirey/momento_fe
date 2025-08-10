@@ -1,19 +1,53 @@
+// camera.no-tf.optimized.tsx
 import { CameraView, useCameraPermissions } from "expo-camera";
 import { router } from "expo-router";
-import React, { useEffect, useState } from "react";
-import { Alert, Linking, StyleSheet } from "react-native";
-import { Button, Image, ScrollView, Text, View } from "tamagui";
-import Icon from "@expo/vector-icons/Ionicons";
+import React, { useEffect, useRef, useState } from "react";
+import {
+  Alert,
+  Linking,
+  StyleSheet,
+  Dimensions,
+  Platform,
+  Animated,
+  Easing,
+} from "react-native";
+import { Image, ScrollView, Text, View } from "tamagui";
+import { DeviceMotion, DeviceMotionMeasurement } from "expo-sensors";
 import TiltIndicator from "@/components/Camera/TiltIndicator";
 import { CameraSceneButton } from "@/components/Camera/CameraSceneButton";
 
-export default function CameraScreen() {
-  const cameraRef = React.useRef<CameraView>(null);
+const { width: SCREEN_W, height: SCREEN_H } = Dimensions.get("window");
+
+// rad ↔ deg
+const rad2deg = (r: number) => (r * 180) / Math.PI;
+const clamp = (v: number, min: number, max: number) =>
+  Math.min(max, Math.max(min, v));
+
+export default function CameraScreenNoTF() {
+  const cameraRef = useRef<CameraView>(null);
   const [cameraPermission, requestCameraPermission] = useCameraPermissions();
   const [isCameraActive, setIsCameraActive] = useState(false);
   const [capturedUris, setCapturedUris] = useState<string[]>([]);
 
-  /* 권한 설정 */
+  // ---- 안정도/각도 체크용 ----
+  const [monitoring, setMonitoring] = useState(false);
+  const baselineRef = useRef<{ roll: number; pitch: number } | null>(null);
+  const stableSinceRef = useRef<number | null>(null);
+  const motionSubRef = useRef<any>(null);
+
+  // ---- 카운트다운 ----
+  const [countdown, setCountdown] = useState<number | null>(null);
+  const countdownTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // 안내 오버레이 애니메이션
+  const overlayOpacity = useRef(new Animated.Value(0)).current;
+
+  // 파라미터(필요시 조정)
+  const DEG_SOFT = 5; // ±5° 이내면 OK
+  const STABLE_WINDOW_MS = 800; // 이 시간 동안 흔들림 낮아야 함
+  const MOTION_RATE_MAX = 45; // deg/s (rotationRate) 임계치: 이보다 작아야 안정적
+
+  // --- 권한 ---
   const checkPermissions = async () => {
     if (!cameraPermission) return;
     if (cameraPermission.status !== "granted") {
@@ -23,36 +57,29 @@ export default function CameraScreen() {
           "앱 설정에서 변경할 수 있습니다.",
           [
             { text: "취소", style: "cancel" },
-            {
-              text: "설정",
-              onPress: () => {
-                Linking.openSettings();
-              },
-            },
+            { text: "설정", onPress: () => Linking.openSettings() },
           ],
           { cancelable: false }
         );
       } else {
-        requestCameraPermission(); // 권한 재요청
+        requestCameraPermission();
       }
     }
   };
 
-  /* 사진 촬영 */
   const takePhoto = async () => {
-    if (cameraRef.current) {
-      try {
-        const photo = await cameraRef.current.takePictureAsync();
-        if (photo?.uri) setCapturedUris((prev) => [...prev, photo.uri]);
-      } catch (error) {
-        console.error("Photo capture failed:", error);
-      }
+    if (!cameraRef.current) return;
+    try {
+      const photo = await cameraRef.current.takePictureAsync();
+      if (photo?.uri) setCapturedUris((prev) => [...prev, photo.uri]);
+    } catch (error) {
+      console.error("Photo capture failed:", error);
     }
   };
 
   const handleDone = () => {
     if (capturedUris.length >= 1) {
-      const jsonUris = encodeURIComponent(JSON.stringify(capturedUris)); // 문자열로 encode
+      const jsonUris = encodeURIComponent(JSON.stringify(capturedUris));
       router.replace({
         pathname: "/(tabs)/scan",
         params: { capturedUris: jsonUris },
@@ -62,9 +89,88 @@ export default function CameraScreen() {
     }
   };
 
+  const stopMonitor = () => {
+    if (motionSubRef.current) {
+      motionSubRef.current.remove();
+      motionSubRef.current = null;
+    }
+    setMonitoring(false);
+    stableSinceRef.current = null;
+
+    Animated.timing(overlayOpacity, {
+      toValue: 0,
+      duration: 150,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  // 센서 콜백: 중앙/수평 + 안정도 판별
+  const onMotion = (data: DeviceMotionMeasurement) => {
+    const rollDeg = rad2deg(data.rotation?.gamma ?? 0); // 좌우
+    const pitchDeg = rad2deg(data.rotation?.beta ?? 0); // 앞뒤
+    // 회전 속도(안정도)
+    const rr = data.rotationRate; // deg/s
+    const rateMag = Math.sqrt(
+      Math.pow(rr?.alpha ?? 0, 2) +
+        Math.pow(rr?.beta ?? 0, 2) +
+        Math.pow(rr?.gamma ?? 0, 2)
+    );
+
+    // 첫 샘플을 중심(베이스라인)으로
+    if (!baselineRef.current) {
+      baselineRef.current = { roll: rollDeg, pitch: pitchDeg };
+      return;
+    }
+
+    const adjRoll = rollDeg - baselineRef.current.roll;
+    const adjPitch = pitchDeg - baselineRef.current.pitch;
+
+    const angleOk =
+      Math.abs(adjRoll) <= DEG_SOFT && Math.abs(adjPitch) <= DEG_SOFT;
+    const motionOk = rateMag <= MOTION_RATE_MAX;
+
+    const now = Date.now();
+    if (angleOk && motionOk) {
+      // 안정 구간 시작/유지
+      if (stableSinceRef.current == null) {
+        stableSinceRef.current = now;
+      }
+      const stableMs = now - stableSinceRef.current;
+      if (stableMs >= STABLE_WINDOW_MS) {
+        // 조건 충족 → 카운트다운 시작
+        stopMonitor();
+        beginCountdownAndShoot();
+      }
+    } else {
+      // 조건 깨지면 타이머 리셋
+      stableSinceRef.current = null;
+    }
+  };
+
+  const beginCountdownAndShoot = () => {
+    if (countdownTimerRef.current) clearInterval(countdownTimerRef.current);
+    let c = 3;
+    setCountdown(c);
+    countdownTimerRef.current = setInterval(() => {
+      c -= 1;
+      if (c <= 0) {
+        clearInterval(countdownTimerRef.current as NodeJS.Timeout);
+        countdownTimerRef.current = null;
+        setCountdown(null);
+        takePhoto();
+      } else {
+        setCountdown(c);
+      }
+    }, 1000);
+  };
+
   useEffect(() => {
     checkPermissions();
     setIsCameraActive(true);
+    return () => {
+      if (motionSubRef.current) motionSubRef.current.remove();
+      if (countdownTimerRef.current) clearInterval(countdownTimerRef.current);
+    };
   }, [cameraPermission]);
 
   return (
@@ -78,23 +184,51 @@ export default function CameraScreen() {
             flash="off"
             animateShutter
           />
+
+          {/* 상단: 각도 보정/토스트 포함 예쁜 인디케이터 */}
           <TiltIndicator />
 
+          {/* 중앙 고정 가이드 박스 */}
+          <View pointerEvents="none" style={styles.centerGuide}>
+            <View style={styles.centerBox}>
+              <View style={StyleSheet.absoluteFill} pointerEvents="none">
+                <View
+                  style={{
+                    flex: 1,
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                ></View>
+              </View>
+            </View>
+            <Text style={styles.centerHint}>
+              가이드 박스에 피사체를 맞춰주세요
+            </Text>
+          </View>
+
+          {/* 이미지 카운터 */}
           <View style={styles.counterContainer}>
             <Text style={styles.counterText}>{capturedUris.length} / 10</Text>
           </View>
+          {/* 하단 컨트롤 */}
           <View style={styles.controls}>
             <CameraSceneButton onPress={handleDone} iconName="checkmark" />
             <CameraSceneButton
-              onPress={takePhoto}
+              onPress={() => {
+                // 수동 촬영
+                if (countdown !== null) return;
+                takePhoto();
+              }}
               iconName="camera-outline"
-              bgColor="#FED2E2"
+              bgColor="#C68EFD "
             />
             <CameraSceneButton
               onPress={() => router.back()}
               iconName="close-outline"
             />
           </View>
+
+          {/* 썸네일 스트립 */}
           {capturedUris.length > 0 && (
             <ScrollView
               horizontal
@@ -118,6 +252,7 @@ export default function CameraScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   camera: { flex: 1 },
+
   controls: {
     position: "absolute",
     bottom: 20,
@@ -125,18 +260,73 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-around",
   },
+
   counterContainer: {
     position: "absolute",
-    top: 50,
+    top: 16,
+    left: 24,
+    alignItems: "center",
+    paddingVertical: 4,
+    zIndex: 100,
+  },
+  counterText: { color: "white", fontSize: 14, fontWeight: "bold" },
+
+  // 중앙 가이드
+  centerGuide: {
+    position: "absolute",
+    top: "35%",
     left: 0,
     right: 0,
     alignItems: "center",
-    backgroundColor: "rgba(0,0,0,0.4)",
-    paddingVertical: 4,
+    zIndex: 8,
   },
-  counterText: {
+  centerBox: {
+    position: "relative",
+    width: SCREEN_W * 0.55,
+    height: SCREEN_W * 0.55,
+    borderWidth: 2,
+    borderColor: "#C68EFD",
+    borderRadius: 12,
+    backgroundColor: "transparent",
+  },
+  centerHint: {
+    marginTop: 8,
     color: "white",
-    fontSize: 18,
-    fontWeight: "bold",
+    fontSize: 12,
+    opacity: 0.85,
   },
+
+  // 모니터링 오버레이
+  monitorOverlay: {
+    position: "absolute",
+    bottom: Platform.select({ ios: 90, android: 90 }),
+    left: "10%",
+    right: "10%",
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderRadius: 10,
+    backgroundColor: "rgba(0,0,0,0.85)",
+    alignItems: "center",
+    zIndex: 20,
+  },
+  monitorText: {
+    color: "white",
+    fontSize: 13,
+    fontWeight: "600",
+    textAlign: "center",
+  },
+
+  // 카운트다운
+  countdownOverlay: {
+    position: "absolute",
+    bottom: 100,
+    left: "10%",
+    right: "10%",
+    borderRadius: 12,
+    backgroundColor: "rgba(0,0,0,0.85)",
+    alignItems: "center",
+    paddingVertical: 12,
+  },
+  countdownText: { color: "white", fontSize: 14, marginBottom: 6 },
+  countNumber: { color: "white", fontSize: 28, fontWeight: "900" },
 });

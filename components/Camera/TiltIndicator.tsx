@@ -6,56 +6,69 @@ import {
   StyleSheet,
   Animated,
   Easing,
+  Pressable,
   Platform,
 } from "react-native";
+import Icon from "@expo/vector-icons/Ionicons";
 
-/** 라디안 ↔ 도 */
+type TiltProps = {
+  mode?: "full" | "bubble-only"; // ← 추가
+};
+
 const rad2deg = (r: number) => (r * 180) / Math.PI;
 const clamp = (v: number, min: number, max: number) =>
   Math.min(max, Math.max(min, v));
+const degreeSoft = 5;
+const degreeHard = 12;
 
-/**
- * UI/로직 파라미터
- * - degreeSoft: 살짝 기울어짐 판단(도)
- * - degreeHard: "너무 기울어짐" 토스트 임계값(도)
- */
-const degreeSoft = 5; // ±5°
-const degreeHard = 12; // ±12°
-const toastDurationMs = 1200;
-const toastCooldownMs = 2500;
+export default function TiltIndicator({ mode = "full" }: TiltProps) {
+  // baseline (calibrated x)
+  const baseline = useRef<{ roll: number; pitch: number }>({
+    roll: 0,
+    pitch: 0,
+  });
+  const [rollDegRaw, setRollDegRaw] = useState(0);
+  const [pitchDegRaw, setPitchDegRaw] = useState(0);
 
-export default function TiltIndicator() {
-  const [rollDeg, setRollDeg] = useState(0); // 좌/우 기울기
-  const [pitchDeg, setPitchDeg] = useState(0); // 앞/뒤 기울기
+  const [rollDeg, setRollDeg] = useState(0);
+  const [pitchDeg, setPitchDeg] = useState(0);
 
-  // 버블 포지션(원 내부 이동) 애니메이션 값
   const bubbleX = useRef(new Animated.Value(0)).current;
   const bubbleY = useRef(new Animated.Value(0)).current;
 
-  // 토스트 상태
+  // 토스트 비슷한 알림
   const [showToast, setShowToast] = useState(false);
   const toastOpacity = useRef(new Animated.Value(0)).current;
   const lastToastAtRef = useRef<number>(0);
   const toastTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const toastDurationMs = 1200;
+  const toastCooldownMs = 2500;
+
+  const initializedRef = useRef(false);
 
   useEffect(() => {
-    // 센서 구독
     const sub = DeviceMotion.addListener((data: DeviceMotionMeasurement) => {
-      // expo-sensors 기준: rotation(beta=Pitch, gamma=Roll) — radians
-      const pitch = data.rotation?.beta ?? 0; // X축 회전
-      const roll = data.rotation?.gamma ?? 0; // Y축 회전
+      const roll = rad2deg(data.rotation?.gamma ?? 0);
+      const pitch = rad2deg(data.rotation?.beta ?? 0);
 
-      const rDeg = rad2deg(roll);
-      const pDeg = rad2deg(pitch);
+      setRollDegRaw(roll);
+      setPitchDegRaw(pitch);
 
-      setRollDeg(rDeg);
-      setPitchDeg(pDeg);
+      // 첫 이벤트를 기준 각도로 채택
+      if (!initializedRef.current) {
+        baseline.current = { roll, pitch };
+        initializedRef.current = true;
+      }
 
-      // 버블 이동(원 안에서 위치)
-      // roll -> x, pitch -> y 로 매핑. -20°~20° 사이 정규화해서 0.9 radius 범위로 이동
-      const normX = clamp(rDeg / 20, -1, 1);
-      const normY = clamp(pDeg / 20, -1, 1);
+      const adjRoll = roll - baseline.current.roll;
+      const adjPitch = pitch - baseline.current.pitch;
 
+      setRollDeg(adjRoll);
+      setPitchDeg(adjPitch);
+
+      // 버블 이동
+      const normX = clamp(adjRoll / 20, -1, 1);
+      const normY = clamp(adjPitch / 20, -1, 1);
       Animated.timing(bubbleX, {
         toValue: normX,
         duration: 100,
@@ -69,9 +82,9 @@ export default function TiltIndicator() {
         useNativeDriver: true,
       }).start();
 
-      // 과도한 기울기 → 토스트 (쿨다운 적용)
+      // 과도 기울기 경고
       const tooTilted =
-        Math.abs(rDeg) > degreeHard || Math.abs(pDeg) > degreeHard;
+        Math.abs(adjRoll) > degreeHard || Math.abs(adjPitch) > degreeHard;
       const now = Date.now();
       if (tooTilted && now - lastToastAtRef.current > toastCooldownMs) {
         lastToastAtRef.current = now;
@@ -79,7 +92,7 @@ export default function TiltIndicator() {
       }
     });
 
-    DeviceMotion.setUpdateInterval(120); // 120ms
+    DeviceMotion.setUpdateInterval(120);
     return () => {
       sub.remove();
       if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
@@ -94,7 +107,6 @@ export default function TiltIndicator() {
       duration: 180,
       useNativeDriver: true,
     }).start();
-
     if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
     toastTimerRef.current = setTimeout(() => {
       Animated.timing(toastOpacity, {
@@ -105,26 +117,25 @@ export default function TiltIndicator() {
     }, toastDurationMs);
   };
 
-  // 상태 라벨/색
+  const calibrateNow = () => {
+    baseline.current = { roll: rollDegRaw, pitch: pitchDegRaw };
+  };
+
   const absR = Math.abs(rollDeg);
   const absP = Math.abs(pitchDeg);
-
   let statusText = "수평";
-  let statusColor = "#22c55e"; // green
+  let statusColor = "#22c55e";
   if (absR > degreeSoft || absP > degreeSoft) {
     statusText = "기울어짐";
-    statusColor = "#f59e0b"; // amber
+    statusColor = "#f59e0b";
   }
   if (absR > degreeHard || absP > degreeHard) {
     statusText = "너무 기울어짐";
-    statusColor = "#ef4444"; // red
+    statusColor = "#ef4444";
   }
 
-  // 중앙 수평 가이드 라인의 회전(roll 반영)
   const guideRotate = `${clamp(rollDeg, -25, 25)}deg`;
-
-  // 원형 버블 컨테이너 내 이동 거리(px)
-  const circleRadius = 40; // 컨테이너 80px
+  const circleRadius = 40;
   const bubbleTranslate = (v: Animated.Value) =>
     v.interpolate({
       inputRange: [-1, 1],
@@ -133,7 +144,7 @@ export default function TiltIndicator() {
 
   return (
     <>
-      {/* 상단 상태 카드 */}
+      {/* 상단 상태 카드 + 중심 재설정 */}
       <View style={styles.topCard}>
         <Text style={[styles.statusText, { color: statusColor }]}>
           {statusText}
@@ -141,27 +152,14 @@ export default function TiltIndicator() {
         <Text style={styles.subText}>
           roll {rollDeg.toFixed(1)}° · pitch {pitchDeg.toFixed(1)}°
         </Text>
+        <Pressable onPress={calibrateNow} style={styles.calibBtn}>
+          <Icon name="locate-outline" size={16} color="#fff" />
+          <Text style={styles.calibText}>현재 각도를 중심으로 재설정</Text>
+        </Pressable>
       </View>
 
-      {/* 중앙 수평 가이드 + 버블 레벨 */}
+      {/* 버블 */}
       <View style={styles.centerWrap} pointerEvents="none">
-        {/* 수평 가이드 라인 */}
-        <View style={styles.guideLineWrapper}>
-          <View
-            style={[
-              styles.guideLine,
-              {
-                transform: [{ rotateZ: guideRotate }],
-                backgroundColor:
-                  absR < degreeSoft
-                    ? "rgba(34,197,94,0.9)"
-                    : "rgba(239,68,68,0.9)",
-              },
-            ]}
-          />
-        </View>
-
-        {/* 버블 레벨 */}
         <View style={styles.bubbleWrap}>
           <View style={styles.bubbleCircle}>
             <Animated.View
@@ -179,8 +177,7 @@ export default function TiltIndicator() {
           <Text style={styles.bubbleHint}>수평을 맞춰주세요</Text>
         </View>
       </View>
-
-      {/* 과도한 기울기 토스트 */}
+      {/* 토스트 */}
       {showToast && (
         <Animated.View
           pointerEvents="none"
@@ -201,7 +198,7 @@ export default function TiltIndicator() {
         >
           <Text style={styles.toastText}>수평 및 높이를 유지해주세요</Text>
           <Text style={[styles.toastText, { opacity: 0.8, fontSize: 12 }]}>
-            (카메라를 너무 기울이면 품질이 떨어질 수 있어요)
+            품질 저하를 방지하려면 기울기를 줄여주세요
           </Text>
         </Animated.View>
       )}
@@ -210,10 +207,9 @@ export default function TiltIndicator() {
 }
 
 const styles = StyleSheet.create({
-  // 상단 카드
   topCard: {
     position: "absolute",
-    top: 50,
+    top: 16,
     left: 16,
     right: 16,
     alignItems: "center",
@@ -224,32 +220,30 @@ const styles = StyleSheet.create({
   },
   statusText: { fontSize: 16, fontWeight: "800" },
   subText: { marginTop: 2, color: "white", fontSize: 12, opacity: 0.95 },
+  calibBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    marginTop: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 8,
+    backgroundColor: "rgba(255,255,255,0.18)",
+  },
+  calibText: { color: "white", fontSize: 12, fontWeight: "700" },
 
-  // 중앙 안내
   centerWrap: {
     position: "absolute",
-    top: "40%",
+    top: "50%",
+    bottom: "50%",
     left: 0,
     right: 0,
     alignItems: "center",
+    justifyContent: "center",
     zIndex: 9,
   },
-  guideLineWrapper: {
-    width: "86%",
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 12,
-  },
-  guideLine: {
-    width: "100%",
-    height: 2,
-    borderRadius: 1,
-  },
 
-  // 버블 레벨
-  bubbleWrap: {
-    alignItems: "center",
-  },
+  bubbleWrap: { alignItems: "center", justifyContent: "center" },
   bubbleCircle: {
     width: 80,
     height: 80,
@@ -265,16 +259,10 @@ const styles = StyleSheet.create({
     width: 12,
     height: 12,
     borderRadius: 6,
-    backgroundColor: "#C68EFD", // 포인트 컬러
+    backgroundColor: "#C68EFD",
   },
-  bubbleHint: {
-    marginTop: 6,
-    color: "white",
-    fontSize: 12,
-    opacity: 0.85,
-  },
+  bubbleHint: { marginTop: 6, color: "white", fontSize: 12, opacity: 0.85 },
 
-  // 토스트
   toast: {
     position: "absolute",
     bottom: Platform.select({ ios: 90, android: 90 }),
