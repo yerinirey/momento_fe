@@ -12,6 +12,7 @@
     "@react-native-async-storage/async-storage": "1.23.1",
     "@react-three/drei": "^9.100.0",
     "@react-three/fiber": "^8.13.5",
+    "@reactvision/react-viro": "^2.43.3",
     "@supabase/supabase-js": "2.48.1",
     "@tamagui/babel-plugin": "1.121.11",
     "@tamagui/config": "1.121.11",

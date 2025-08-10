@@ -26,7 +26,7 @@ export default function ProductScreen() {
     }
   }, [id]);
 
-  const onViewType = (viewType: "THREED" | "AR" | "WEBVIEW") => {
+  const onViewType = (viewType: "THREED" | "AR") => {
     router.push(`/product/${viewType}?modelUrl=${product?.model3DUrl}`);
   };
 
@@ -53,23 +53,21 @@ export default function ProductScreen() {
         <XStack jc={"flex-start"} gap={10} my={20}>
           {product.model3DUrl && (
             <>
-              {["THREED", "AR", "WEBVIEW"].map((viewType) => (
+              {["THREED", "AR"].map((viewType) => (
                 <Button
                   key={viewType}
                   bw={1}
                   br={10}
                   bg={"$pointColor"}
                   textProps={{ color: "black", fos: 14 }}
-                  onPress={() =>
-                    onViewType(viewType as "THREED" | "AR" | "WEBVIEW")
-                  }
+                  onPress={() => onViewType(viewType as "THREED" | "AR")}
                 >
                   {/* <MCIcon
                     name="arrow-u-left-bottom"
                     size={20}
                     color="$pointColor"
                   /> */}
-                  {viewType === "THREED" ? "3D" : viewType}
+                  {viewType === "THREED" ? "3D" : "AR"}
                 </Button>
               ))}
             </>

@@ -35,7 +35,15 @@
           "backgroundColor": "#ffffff"
         }
       ],
-      "expo-asset"
+      "expo-asset",
+      [
+        "@reactvision/react-viro",
+        {
+          "android": {
+            "xRMode": "AR"
+          }
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true
