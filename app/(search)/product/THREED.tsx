@@ -31,22 +31,3 @@ export default function THREEDScreen() {
     </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  buttonContainer: {
-    marginHorizontal: 20,
-    marginBottom: 20,
-  },
-  button: {
-    backgroundColor: "#3F6900",
-    padding: 18,
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: 24,
-  },
-  textButton: {
-    color: "white",
-    fontSize: 20,
-    fontWeight: "bold",
-  },
-});

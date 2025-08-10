@@ -5,7 +5,7 @@ import { Alert, Linking, StyleSheet } from "react-native";
 import { Button, Image, ScrollView, Text, View } from "tamagui";
 import Icon from "@expo/vector-icons/Ionicons";
 import TiltIndicator from "@/components/Camera/TiltIndicator";
-import { CameraSceneButton } from "@/components/Shared/CameraSceneButton";
+import { CameraSceneButton } from "@/components/Camera/CameraSceneButton";
 
 export default function CameraScreen() {
   const cameraRef = React.useRef<CameraView>(null);

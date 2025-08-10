@@ -1,5 +1,4 @@
-// ARScreen.tsx
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   View,
   Text as RNText,
@@ -7,90 +6,118 @@ import {
   Modal,
   Pressable,
   StyleSheet,
+  Animated,
 } from "react-native";
 import {
   ViroARScene,
   ViroARSceneNavigator,
   Viro3DObject,
-  ViroARPlane,
   ViroAmbientLight,
-  ViroMaterials,
-  ViroQuad,
   ViroClickStateTypes,
 } from "@reactvision/react-viro";
 import { useLocalSearchParams } from "expo-router";
 import { Viro3DPoint } from "@reactvision/react-viro/dist/components/Types/ViroUtils";
 
-/** Scene에 주입되는 prop 타입 */
+/** 회전(각도)에서 카메라 전방 벡터 추정 */
+function forwardFromRotationDeg(rot: number[]): Viro3DPoint {
+  // rot = [x(pitch), y(yaw), z(roll)] in degrees (일반적으로)
+  const rx = (rot[0] ?? 0) * (Math.PI / 180);
+  const ry = (rot[1] ?? 0) * (Math.PI / 180);
+  // Z(roll)는 전방 계산에 크게 영향 없음
+  // 추정식: y축(yaw), x축(pitch)
+  const cx = Math.cos(rx);
+  const sx = Math.sin(rx);
+  const cy = Math.cos(ry);
+  const sy = Math.sin(ry);
+  // 화면을 기준으로 "앞"을 -Z로 보고, yaw/pitch를 적용
+  // 이 근사치는 Viro의 좌표계에서 잘 작동함
+  const fx = -sy * cx;
+  const fy = sx;
+  const fz = -cy * cx;
+  return [fx, fy, fz];
+}
+
 type SceneBridgeProps = {
   modelUrl: string;
-  placementMode: boolean;
   placedPosition: Viro3DPoint | null;
-  onModelReady: () => void;
   onRequestPlaceAt: (p: Viro3DPoint) => void;
+  onModelLoadStart: () => void;
+  onModelLoadEnd: () => void;
 };
 
-/** Viro가 sceneNavigator를 주입하므로 any로 받아 처리 */
 const Scene: React.FC<any> = (props) => {
   const {
     modelUrl,
-    placementMode,
     placedPosition,
-    onModelReady,
     onRequestPlaceAt,
+    onModelLoadStart,
+    onModelLoadEnd,
   } = props.sceneNavigator.viroAppProps as SceneBridgeProps;
 
-  // 가이드용 머티리얼 1회 정의
-  useEffect(() => {
-    ViroMaterials.createMaterials({
-      QuadMaterial: { lightingModel: "Constant", diffuseColor: "#aaaaaa" },
-    });
-  }, []);
+  const sceneRef = useRef<any>(null);
+
+  // 최근 카메라 포즈 저장
+  const lastCam = useRef<{ position: Viro3DPoint; forward: Viro3DPoint }>({
+    position: [0, 0, 0],
+    forward: [0, 0, -1],
+  });
+
+  // 카메라 포즈 갱신
+  const onCameraTransformUpdate = (e: {
+    position?: Viro3DPoint;
+    rotation?: number[]; // [x,y,z] degrees
+    forward?: Viro3DPoint;
+  }) => {
+    if (Array.isArray(e.position) && e.position.length === 3) {
+      lastCam.current.position = [
+        Number(e.position[0]) || 0,
+        Number(e.position[1]) || 0,
+        Number(e.position[2]) || 0,
+      ];
+    }
+    if (Array.isArray(e.forward) && e.forward.length === 3) {
+      lastCam.current.forward = [
+        Number(e.forward[0]) || 0,
+        Number(e.forward[1]) || 0,
+        Number(e.forward[2]) || -1,
+      ];
+    } else if (Array.isArray(e.rotation) && e.rotation.length >= 2) {
+      lastCam.current.forward = forwardFromRotationDeg(e.rotation);
+    }
+  };
+
+  // 탭 → 카메라 전방 1m에 배치 (히트테스트 없이)
+  const placeInFront = (distance = 1.0) => {
+    const { position, forward } = lastCam.current;
+    const target: Viro3DPoint = [
+      position[0] + forward[0] * distance,
+      position[1] + forward[1] * distance,
+      position[2] + forward[2] * distance,
+    ];
+    console.log("[AR] place using camera pose →", target);
+    onRequestPlaceAt(target);
+  };
 
   return (
-    <ViroARScene>
+    <ViroARScene
+      ref={sceneRef}
+      onCameraTransformUpdate={onCameraTransformUpdate}
+      onClick={() => placeInFront(1.0)}
+      onClickState={(state: number) => {
+        if (state === ViroClickStateTypes.CLICKED) placeInFront(1.0);
+      }}
+    >
       <ViroAmbientLight color="white" />
-
-      {/* 1) 프리로드: 투명 상태로 로드 완료 신호만 받음 */}
-      <Viro3DObject
-        source={{ uri: modelUrl }}
-        type="GLB"
-        position={[0, 0, -0.6]}
-        scale={[1, 1, 1]}
-        opacity={0}
-        onLoadEnd={onModelReady}
-      />
-
-      {/* 2) 배치 모드일 때: 클릭 가이드(수평 Quad) */}
-      {placementMode && (
-        <ViroARPlane dragType="FixedToWorld">
-          <ViroQuad
-            visible
-            position={[0, 0, 0]}
-            width={1}
-            height={1}
-            rotation={[-90, 0, 0]}
-            materials="QuadMaterial"
-            onClickState={(state, pos) => {
-              if (state === ViroClickStateTypes.CLICKED) {
-                onRequestPlaceAt(pos);
-              }
-            }}
-          />
-        </ViroARPlane>
-      )}
-
-      {/* 3) 배치 완료 후: 실제 모델 표시(드래그 가능) */}
-      {!placementMode && placedPosition && (
-        <ViroARPlane dragType="FixedToWorld">
-          <Viro3DObject
-            source={{ uri: modelUrl }}
-            type="GLB"
-            position={placedPosition}
-            scale={[1, 1, 1]}
-            onDrag={() => {}}
-          />
-        </ViroARPlane>
+      {placedPosition && (
+        <Viro3DObject
+          source={{ uri: modelUrl }}
+          type="GLB"
+          position={placedPosition}
+          scale={[0.1, 0.1, 0.1]}
+          onLoadStart={onModelLoadStart}
+          onLoadEnd={onModelLoadEnd}
+          onError={(e) => console.log("[AR] model error", e.nativeEvent)}
+        />
       )}
     </ViroARScene>
   );
@@ -99,72 +126,79 @@ const Scene: React.FC<any> = (props) => {
 export default function ARScreen() {
   const { modelUrl } = useLocalSearchParams<{ modelUrl: string }>();
 
-  // UI / 흐름 상태
-  const [isLoading, setIsLoading] = useState(true); // 모델 프리로드 중
-  const [showGuideModal, setShowGuideModal] = useState(false); // 안내 모달
-  const [placementMode, setPlacementMode] = useState(false); // 배치 모드
+  const [isLoading, setIsLoading] = useState(false);
+  const [showGuideModal, setShowGuideModal] = useState(true);
   const [placedPosition, setPlacedPosition] = useState<Viro3DPoint | null>(
     null
   );
 
-  // 모델 준비 완료 콜백 (Scene -> ARScreen)
-  const onModelReady = () => {
-    if (isLoading) {
-      setIsLoading(false);
-      setShowGuideModal(true);
-    }
+  // 토스트
+  const [showToast, setShowToast] = useState(false);
+  const toastOpacity = useRef(new Animated.Value(0)).current;
+  const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
+    };
+  }, []);
+
+  const showPlacementToast = () => {
+    setShowToast(true);
+    Animated.timing(toastOpacity, {
+      toValue: 1,
+      duration: 200,
+      useNativeDriver: true,
+    }).start();
+
+    if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
+    hideTimerRef.current = setTimeout(() => {
+      Animated.timing(toastOpacity, {
+        toValue: 0,
+        duration: 200,
+        useNativeDriver: true,
+      }).start(() => setShowToast(false));
+    }, 1000);
   };
 
-  // 모달 OK → 배치 모드로 진입(모델 숨김)
-  const onPressGuideOK = () => {
-    setShowGuideModal(false);
-    setPlacedPosition(null);
-    setPlacementMode(true);
-  };
-
-  // Scene에서 좌표 전달 → 그 위치에 모델 배치
   const onRequestPlaceAt = (pos: Viro3DPoint) => {
+    console.log("[AR] place at", pos);
     setPlacedPosition(pos);
-    setPlacementMode(false);
+    showPlacementToast();
   };
 
-  // Scene으로 넘길 bridge props
   const viroAppProps = useMemo<SceneBridgeProps>(
     () => ({
       modelUrl,
-      placementMode,
       placedPosition,
-      onModelReady,
       onRequestPlaceAt,
+      onModelLoadStart: () => setIsLoading(true),
+      onModelLoadEnd: () => setIsLoading(false),
     }),
-    [modelUrl, placementMode, placedPosition]
+    [modelUrl, placedPosition]
   );
 
   return (
     <View style={{ flex: 1 }}>
-      {/* 디버그용 상단 바 */}
-      <View style={styles.header}>
+      <View style={styles.header} pointerEvents="box-none">
         <RNText numberOfLines={1} style={styles.headerText}>
           {modelUrl}
         </RNText>
       </View>
 
       <ViroARSceneNavigator
-        // 타입 정의는 () => Element를 요구하므로 캐스팅해 전달
         initialScene={{ scene: Scene as unknown as () => JSX.Element }}
         viroAppProps={viroAppProps}
         autofocus
       />
 
-      {/* 1) 로딩 오버레이 */}
       {isLoading && (
-        <View style={styles.overlay}>
+        <View style={styles.overlay} pointerEvents="none">
           <ActivityIndicator size="large" />
           <RNText style={styles.overlayText}>모델 로딩 중…</RNText>
         </View>
       )}
 
-      {/* 2) 안내 모달 */}
       <Modal
         visible={showGuideModal}
         transparent
@@ -175,14 +209,41 @@ export default function ARScreen() {
           <View style={styles.modalCard}>
             <RNText style={styles.modalTitle}>배치 안내</RNText>
             <RNText style={styles.modalBody}>
-              원하는 위치를 클릭해서 모델을 배치해보세요!
+              화면을 탭하면 현재 카메라 전방 1m 지점에 모델을 배치합니다.
             </RNText>
-            <Pressable style={styles.modalBtn} onPress={onPressGuideOK}>
+            <Pressable
+              style={styles.modalBtn}
+              onPress={() => setShowGuideModal(false)}
+            >
               <RNText style={styles.modalBtnText}>OK</RNText>
             </Pressable>
           </View>
         </View>
       </Modal>
+
+      {showToast && (
+        <Animated.View
+          pointerEvents="none"
+          style={[
+            styles.toastContainer,
+            {
+              opacity: toastOpacity,
+              transform: [
+                {
+                  translateY: toastOpacity.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [50, 0],
+                  }),
+                },
+              ],
+            },
+          ]}
+        >
+          <RNText style={styles.toastText}>
+            평면 클릭 인식됨. 모델을 배치합니다.
+          </RNText>
+        </Animated.View>
+      )}
     </View>
   );
 }
@@ -230,4 +291,17 @@ const styles = StyleSheet.create({
     backgroundColor: "#333",
   },
   modalBtnText: { color: "white", fontWeight: "600" },
+
+  toastContainer: {
+    position: "absolute",
+    bottom: 60,
+    left: "10%",
+    right: "10%",
+    backgroundColor: "rgba(0,0,0,0.8)",
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  toastText: { color: "white", fontSize: 14, textAlign: "center" },
 });
