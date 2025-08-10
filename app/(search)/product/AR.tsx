@@ -8,6 +8,7 @@ import {
   StyleSheet,
   Animated,
 } from "react-native";
+import Slider from "@react-native-community/slider";
 import {
   ViroARScene,
   ViroARSceneNavigator,
@@ -20,17 +21,12 @@ import { Viro3DPoint } from "@reactvision/react-viro/dist/components/Types/ViroU
 
 /** 회전(각도)에서 카메라 전방 벡터 추정 */
 function forwardFromRotationDeg(rot: number[]): Viro3DPoint {
-  // rot = [x(pitch), y(yaw), z(roll)] in degrees (일반적으로)
   const rx = (rot[0] ?? 0) * (Math.PI / 180);
   const ry = (rot[1] ?? 0) * (Math.PI / 180);
-  // Z(roll)는 전방 계산에 크게 영향 없음
-  // 추정식: y축(yaw), x축(pitch)
   const cx = Math.cos(rx);
   const sx = Math.sin(rx);
   const cy = Math.cos(ry);
   const sy = Math.sin(ry);
-  // 화면을 기준으로 "앞"을 -Z로 보고, yaw/pitch를 적용
-  // 이 근사치는 Viro의 좌표계에서 잘 작동함
   const fx = -sy * cx;
   const fy = sx;
   const fz = -cy * cx;
@@ -43,6 +39,7 @@ type SceneBridgeProps = {
   onRequestPlaceAt: (p: Viro3DPoint) => void;
   onModelLoadStart: () => void;
   onModelLoadEnd: () => void;
+  scale: number;
 };
 
 const Scene: React.FC<any> = (props) => {
@@ -52,20 +49,17 @@ const Scene: React.FC<any> = (props) => {
     onRequestPlaceAt,
     onModelLoadStart,
     onModelLoadEnd,
+    scale,
   } = props.sceneNavigator.viroAppProps as SceneBridgeProps;
 
-  const sceneRef = useRef<any>(null);
-
-  // 최근 카메라 포즈 저장
   const lastCam = useRef<{ position: Viro3DPoint; forward: Viro3DPoint }>({
     position: [0, 0, 0],
     forward: [0, 0, -1],
   });
 
-  // 카메라 포즈 갱신
   const onCameraTransformUpdate = (e: {
     position?: Viro3DPoint;
-    rotation?: number[]; // [x,y,z] degrees
+    rotation?: number[];
     forward?: Viro3DPoint;
   }) => {
     if (Array.isArray(e.position) && e.position.length === 3) {
@@ -86,7 +80,6 @@ const Scene: React.FC<any> = (props) => {
     }
   };
 
-  // 탭 → 카메라 전방 1m에 배치 (히트테스트 없이)
   const placeInFront = (distance = 1.0) => {
     const { position, forward } = lastCam.current;
     const target: Viro3DPoint = [
@@ -100,7 +93,6 @@ const Scene: React.FC<any> = (props) => {
 
   return (
     <ViroARScene
-      ref={sceneRef}
       onCameraTransformUpdate={onCameraTransformUpdate}
       onClick={() => placeInFront(1.0)}
       onClickState={(state: number) => {
@@ -113,7 +105,7 @@ const Scene: React.FC<any> = (props) => {
           source={{ uri: modelUrl }}
           type="GLB"
           position={placedPosition}
-          scale={[0.1, 0.1, 0.1]}
+          scale={[scale, scale, scale]}
           onLoadStart={onModelLoadStart}
           onLoadEnd={onModelLoadEnd}
           onError={(e) => console.log("[AR] model error", e.nativeEvent)}
@@ -131,6 +123,12 @@ export default function ARScreen() {
   const [placedPosition, setPlacedPosition] = useState<Viro3DPoint | null>(
     null
   );
+
+  // 🔹 모델 스케일 상태
+  const [scale, setScale] = useState(0.1);
+  const minScale = 0.01;
+  const maxScale = 2.0;
+  const step = 0.01;
 
   // 토스트
   const [showToast, setShowToast] = useState(false);
@@ -174,12 +172,25 @@ export default function ARScreen() {
       onRequestPlaceAt,
       onModelLoadStart: () => setIsLoading(true),
       onModelLoadEnd: () => setIsLoading(false),
+      scale,
     }),
-    [modelUrl, placedPosition]
+    [modelUrl, placedPosition, scale]
   );
+
+  // 🔹 버튼 핸들러
+  const nudgeScale = (delta: number) => {
+    setScale((prev) => {
+      const next = Math.min(
+        maxScale,
+        Math.max(minScale, +(prev + delta).toFixed(2))
+      );
+      return next;
+    });
+  };
 
   return (
     <View style={{ flex: 1 }}>
+      {/* 상단 디버그 바 */}
       <View style={styles.header} pointerEvents="box-none">
         <RNText numberOfLines={1} style={styles.headerText}>
           {modelUrl}
@@ -199,6 +210,7 @@ export default function ARScreen() {
         </View>
       )}
 
+      {/* 첫 진입 안내 */}
       <Modal
         visible={showGuideModal}
         transparent
@@ -221,6 +233,33 @@ export default function ARScreen() {
         </View>
       </Modal>
 
+      {/* 🔹 하단 스케일 컨트롤러 (슬라이더 + +/-) */}
+      <View style={styles.scaleBar} pointerEvents="box-none">
+        <View style={styles.scaleControls}>
+          <Pressable style={styles.scaleBtn} onPress={() => nudgeScale(-0.05)}>
+            <RNText style={styles.scaleBtnText}>-</RNText>
+          </Pressable>
+
+          <View style={styles.sliderWrap}>
+            <Slider
+              minimumValue={minScale}
+              maximumValue={maxScale}
+              step={step}
+              value={scale}
+              onValueChange={setScale}
+              minimumTrackTintColor="#C68EFD"
+              maximumTrackTintColor="#999999"
+            />
+            <RNText style={styles.scaleValue}>{scale.toFixed(2)}x</RNText>
+          </View>
+
+          <Pressable style={styles.scaleBtn} onPress={() => nudgeScale(+0.05)}>
+            <RNText style={styles.scaleBtnText}>+</RNText>
+          </Pressable>
+        </View>
+      </View>
+
+      {/* 토스트 */}
       {showToast && (
         <Animated.View
           pointerEvents="none"
@@ -260,6 +299,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
   },
   headerText: { color: "white" },
+
   overlay: {
     ...StyleSheet.absoluteFillObject,
     zIndex: 20,
@@ -269,6 +309,7 @@ const styles = StyleSheet.create({
     paddingBottom: 60,
   },
   overlayText: { marginTop: 12, color: "white", fontSize: 16 },
+
   modalBackdrop: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: "rgba(0,0,0,0.45)",
@@ -292,9 +333,40 @@ const styles = StyleSheet.create({
   },
   modalBtnText: { color: "white", fontWeight: "600" },
 
+  // 스케일 컨트롤
+  scaleBar: {
+    position: "absolute",
+    bottom: 14,
+    left: 0,
+    right: 0,
+    zIndex: 15,
+    alignItems: "center",
+  },
+  scaleControls: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.65)",
+    borderRadius: 12,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    width: "88%",
+  },
+  scaleBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 10,
+    backgroundColor: "rgba(255,255,255,0.15)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  scaleBtnText: { color: "white", fontSize: 22, fontWeight: "700" },
+  sliderWrap: { flex: 1, paddingHorizontal: 12 },
+  scaleValue: { color: "white", textAlign: "right", marginTop: 6 },
+
+  // 토스트
   toastContainer: {
     position: "absolute",
-    bottom: 60,
+    bottom: 80,
     left: "10%",
     right: "10%",
     backgroundColor: "rgba(0,0,0,0.8)",
