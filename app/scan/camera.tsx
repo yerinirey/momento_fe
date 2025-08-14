@@ -206,12 +206,12 @@ export default function CameraScreenNoTF() {
         <View style={styles.container}>
           <CameraView
             ref={cameraRef}
-            style={styles.camera}
+            style={StyleSheet.absoluteFill}
             facing="back"
             flash="off"
           />
 
-          {/* 상단: 각도 보정/토스트 포함 예쁜 인디케이터 */}
+          {/* 상단: 각도 보정/토스트 인디케이터 */}
           <TiltIndicator />
 
           {/* 중앙 고정 가이드 박스 */}
@@ -276,24 +276,28 @@ export default function CameraScreenNoTF() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
-  camera: { flex: 1 },
+  container: { flex: 1, position: "relative", backgroundColor: "black" },
+
+  camera: { ...StyleSheet.absoluteFillObject },
 
   controls: {
     position: "absolute",
     bottom: 20,
-    width: "100%",
+    left: 0,
+    right: 0,
+    // width: "100%",
     flexDirection: "row",
     justifyContent: "space-around",
+    zIndex: 20,
   },
 
   counterContainer: {
     position: "absolute",
     top: 16,
     left: 24,
-    alignItems: "center",
+    // alignItems: "center",
     paddingVertical: 4,
-    zIndex: 100,
+    zIndex: 20,
   },
   counterText: { color: "white", fontSize: 14, fontWeight: "bold" },
 
