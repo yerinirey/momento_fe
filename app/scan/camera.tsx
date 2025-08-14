@@ -25,29 +25,30 @@ const clamp = (v: number, min: number, max: number) =>
 
 export default function CameraScreenNoTF() {
   const cameraRef = useRef<CameraView>(null);
+  const [capturing, setCapturing] = useState(false);
   const [cameraPermission, requestCameraPermission] = useCameraPermissions();
   const [isCameraActive, setIsCameraActive] = useState(false);
   const [capturedUris, setCapturedUris] = useState<string[]>([]);
 
-  // ---- 안정도/각도 체크용 ----
+  // 안정도/각도 체크용
   const [monitoring, setMonitoring] = useState(false);
   const baselineRef = useRef<{ roll: number; pitch: number } | null>(null);
   const stableSinceRef = useRef<number | null>(null);
   const motionSubRef = useRef<any>(null);
 
-  // ---- 카운트다운 ----
+  // 카운트다운
   const [countdown, setCountdown] = useState<number | null>(null);
   const countdownTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // 안내 오버레이 애니메이션
   const overlayOpacity = useRef(new Animated.Value(0)).current;
 
-  // 파라미터(필요시 조정)
-  const DEG_SOFT = 5; // ±5° 이내면 OK
+  // 파라미터
+  const DEG_SOFT = 5; // ±5 이내
   const STABLE_WINDOW_MS = 800; // 이 시간 동안 흔들림 낮아야 함
-  const MOTION_RATE_MAX = 45; // deg/s (rotationRate) 임계치: 이보다 작아야 안정적
+  const MOTION_RATE_MAX = 45; // 임계치: 이보다 작아야 안정적
 
-  // --- 권한 ---
+  // 권한
   const checkPermissions = async () => {
     if (!cameraPermission) return;
     if (cameraPermission.status !== "granted") {
@@ -68,12 +69,38 @@ export default function CameraScreenNoTF() {
   };
 
   const takePhoto = async () => {
-    if (!cameraRef.current) return;
+    if (!cameraRef.current || capturing) return;
     try {
-      const photo = await cameraRef.current.takePictureAsync();
-      if (photo?.uri) setCapturedUris((prev) => [...prev, photo.uri]);
+      setCapturing(true);
+
+      // 1) 촬영 순간 JS 부하 줄이기: 센서 잠깐 중지
+      if (motionSubRef.current) {
+        motionSubRef.current.remove();
+        motionSubRef.current = null;
+      }
+
+      // 2) 빠른 촬영 옵션
+      const photo = await cameraRef.current.takePictureAsync({
+        quality: 0.6, // 0~1 (0.6~0.8 추천, 더 낮추면 더 빠름)
+        base64: false, // 인코딩 비용 줄이기
+        exif: false, // 메타 쓰기 비용 줄이기
+        skipProcessing: true, // 후처리 끄기 → 가장 큰 체감 향상
+      });
+
+      if (photo?.uri) {
+        // UI 즉시 반응
+        setCapturedUris((prev) => [photo.uri, ...prev]);
+      }
     } catch (error) {
       console.error("Photo capture failed:", error);
+    } finally {
+      setCapturing(false);
+
+      // 3) 센서 재개
+      if (!motionSubRef.current) {
+        motionSubRef.current = DeviceMotion.addListener(onMotion);
+        DeviceMotion.setUpdateInterval(120);
+      }
     }
   };
 
@@ -182,7 +209,6 @@ export default function CameraScreenNoTF() {
             style={styles.camera}
             facing="back"
             flash="off"
-            animateShutter
           />
 
           {/* 상단: 각도 보정/토스트 포함 예쁜 인디케이터 */}
@@ -216,7 +242,7 @@ export default function CameraScreenNoTF() {
             <CameraSceneButton
               onPress={() => {
                 // 수동 촬영
-                if (countdown !== null) return;
+                if (countdown !== null || capturing) return;
                 takePhoto();
               }}
               iconName="camera-outline"

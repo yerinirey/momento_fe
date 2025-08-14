@@ -14,7 +14,7 @@ export default function THREEDScreen() {
 
   return (
     <SafeAreaView>
-      <View style={{ height: "80%" }} {...events}>
+      <View style={{ height: "100%" }} {...events}>
         <Canvas events={null as any}>
           <OrbitControls enablePan={false} />
           <directionalLight position={[1, 0, 0]} args={["white", 5]} />

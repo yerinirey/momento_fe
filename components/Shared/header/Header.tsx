@@ -28,7 +28,7 @@ export function Header({ options }: StackHeaderProps | TabsHeaderProps) {
 
   if (options.headerLeft || options.headerTitle || options.headerRight) {
     return (
-      <YStack bg={"$colorTransparent"}>
+      <YStack bg={"$pointColor"}>
         <XStack
           jc={"space-between"}
           py={10}

@@ -61,7 +61,7 @@ export default function Login() {
       ),
       headerTitle: () => (
         <Text fos={16} fow={"bold"}>
-          Amazon.es
+          Momento
         </Text>
       ),
     });
@@ -167,37 +167,6 @@ export default function Login() {
           </DefaultButton>
         </>
       )}
-      {/* <XStack w={"100%"} ai={"center"} jc={"center"}>
-        <Text>By continuing, you agree to Amazon;s </Text>
-        <Text textDecorationLine="underline" color={"#146eb4"}>
-          Conditions
-        </Text>
-      </XStack>
-      <XStack
-        mt={10}
-        h={3}
-        bg={"lightgray"}
-        w={Dimensions.get("window").width}
-      />
-      <YStack gap={20}>
-        <XStack gap={20}>
-          {["Conditions of use", "Privacy Notice", "Help"].map(
-            (link, index) => (
-              <Text
-                key={`${link}-${index}`}
-                fos={16}
-                textDecorationLine="underline"
-                color={"#146eb4"}
-              >
-                {link}
-              </Text>
-            )
-          )}
-        </XStack>
-        <Text color={"gray"} fos={14}>
-          ⓒ 1996-2021, Amazon.com, Inc. or its affiliates
-        </Text>
-      </YStack> */}
     </YStack>
   );
 }
