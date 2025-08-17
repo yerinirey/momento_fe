@@ -29,7 +29,6 @@ export default function Model({ modelUrl, ...props }: ModelProps) {
   const { scene } = useGLTF(modelUrl);
   const [ready, setReady] = useState(false);
   const patched = useRef(false);
-
   useEffect(() => {
     if (patched.current) return;
 
