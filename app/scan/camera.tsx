@@ -1,4 +1,3 @@
-// camera.no-tf.optimized.tsx
 import { CameraView, useCameraPermissions } from "expo-camera";
 import { router } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
@@ -10,21 +9,27 @@ import {
   Platform,
   Animated,
   Easing,
+  useWindowDimensions,
+  View,
 } from "react-native";
-import { Image, ScrollView, Text, View } from "tamagui";
+import { Image, ScrollView, Text } from "tamagui";
 import { DeviceMotion, DeviceMotionMeasurement } from "expo-sensors";
 import TiltIndicator from "@/components/Camera/TiltIndicator";
 import { CameraSceneButton } from "@/components/Camera/CameraSceneButton";
-
-const { width: SCREEN_W, height: SCREEN_H } = Dimensions.get("window");
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 // rad ↔ deg
 const rad2deg = (r: number) => (r * 180) / Math.PI;
-const clamp = (v: number, min: number, max: number) =>
-  Math.min(max, Math.max(min, v));
 
 export default function CameraScreenNoTF() {
   const cameraRef = useRef<CameraView>(null);
+  const { width, height } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
+  const usableW = width;
+  const usableH = height - insets.top - insets.bottom;
+  const guideSize = usableW * 0.55;
+  const guideTop = insets.top + usableH * 0.35; // 기존 '35%'를 안전영역 포함 계산으로
+
   const [capturing, setCapturing] = useState(false);
   const [cameraPermission, requestCameraPermission] = useCameraPermissions();
   const [isCameraActive, setIsCameraActive] = useState(false);
@@ -215,29 +220,27 @@ export default function CameraScreenNoTF() {
           <TiltIndicator />
 
           {/* 중앙 고정 가이드 박스 */}
-          <View pointerEvents="none" style={styles.centerGuide}>
-            <View style={styles.centerBox}>
-              <View style={StyleSheet.absoluteFill} pointerEvents="none">
-                <View
-                  style={{
-                    flex: 1,
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                ></View>
-              </View>
-            </View>
+          <View
+            pointerEvents="none"
+            style={[styles.centerGuide, { top: guideTop }]}
+          >
+            <View
+              style={[
+                styles.centerBox,
+                { width: guideSize, height: guideSize },
+              ]}
+            />
             <Text style={styles.centerHint}>
               가이드 박스에 피사체를 맞춰주세요
             </Text>
           </View>
 
           {/* 이미지 카운터 */}
-          <View style={styles.counterContainer}>
+          <View style={[styles.counterContainer, { top: insets.top + 8 }]}>
             <Text style={styles.counterText}>{capturedUris.length} / 10</Text>
           </View>
           {/* 하단 컨트롤 */}
-          <View style={styles.controls}>
+          <View style={[styles.controls, { bottom: insets.bottom + 20 }]}>
             <CameraSceneButton onPress={handleDone} iconName="checkmark" />
             <CameraSceneButton
               onPress={() => {
@@ -258,7 +261,7 @@ export default function CameraScreenNoTF() {
           {capturedUris.length > 0 && (
             <ScrollView
               horizontal
-              style={{ position: "absolute", bottom: 100 }}
+              style={{ position: "absolute", bottom: insets.bottom + 100 }}
             >
               {capturedUris.map((uri, index) => (
                 <Image
@@ -282,7 +285,6 @@ const styles = StyleSheet.create({
 
   controls: {
     position: "absolute",
-    bottom: 20,
     left: 0,
     right: 0,
     // width: "100%",
@@ -293,9 +295,7 @@ const styles = StyleSheet.create({
 
   counterContainer: {
     position: "absolute",
-    top: 16,
     left: 24,
-    // alignItems: "center",
     paddingVertical: 4,
     zIndex: 20,
   },
@@ -304,7 +304,6 @@ const styles = StyleSheet.create({
   // 중앙 가이드
   centerGuide: {
     position: "absolute",
-    top: "35%",
     left: 0,
     right: 0,
     alignItems: "center",
@@ -312,8 +311,8 @@ const styles = StyleSheet.create({
   },
   centerBox: {
     position: "relative",
-    width: SCREEN_W * 0.55,
-    height: SCREEN_W * 0.55,
+    // width: SCREEN_W * 0.55,
+    // height: SCREEN_W * 0.55,
     borderWidth: 2,
     borderColor: "#C68EFD",
     borderRadius: 12,
@@ -325,38 +324,4 @@ const styles = StyleSheet.create({
     fontSize: 12,
     opacity: 0.85,
   },
-
-  // 모니터링 오버레이
-  monitorOverlay: {
-    position: "absolute",
-    bottom: Platform.select({ ios: 90, android: 90 }),
-    left: "10%",
-    right: "10%",
-    paddingVertical: 10,
-    paddingHorizontal: 14,
-    borderRadius: 10,
-    backgroundColor: "rgba(0,0,0,0.85)",
-    alignItems: "center",
-    zIndex: 20,
-  },
-  monitorText: {
-    color: "white",
-    fontSize: 13,
-    fontWeight: "600",
-    textAlign: "center",
-  },
-
-  // 카운트다운
-  countdownOverlay: {
-    position: "absolute",
-    bottom: 100,
-    left: "10%",
-    right: "10%",
-    borderRadius: 12,
-    backgroundColor: "rgba(0,0,0,0.85)",
-    alignItems: "center",
-    paddingVertical: 12,
-  },
-  countdownText: { color: "white", fontSize: 14, marginBottom: 6 },
-  countNumber: { color: "white", fontSize: 28, fontWeight: "900" },
 });
