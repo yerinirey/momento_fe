@@ -2,40 +2,9 @@ import { DefaultButton } from "@/components/Shared/DefaultButton";
 import { useBookmark } from "@/context/BookmarkProvider";
 import { supabase } from "@/supabase";
 import { Product } from "@/types/product";
-import { summarizeGLTF, useDumpGLTF } from "@/utils/gltfDebug";
-import MCIcon from "@expo/vector-icons/MaterialCommunityIcons";
 import { router, useLocalSearchParams } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import { Button, Image, ScrollView, Text, XStack, YStack } from "tamagui";
-
-function GLTFDebugMount({ uri, name }: { uri: string; name: string }) {
-  // GLB 로드 + parser.json 저장 (useDumpGLTF 내부에서 콘솔/파일 저장도 수행)
-  const gltf = useDumpGLTF(uri, name);
-
-  useEffect(() => {
-    const pure = gltf?.parser?.json;
-    if (!pure) return;
-    // 요약 표 출력: UV/Color/Material 인덱스 등
-    const rows = summarizeGLTF(pure);
-    console.table(rows);
-    // 추가 경고도 같이:
-    rows.forEach((r: any) => {
-      if (!r.materialValid) {
-        console.warn(
-          `⚠️ Invalid material index at mesh ${r.mesh} prim ${r.prim}:`,
-          r.materialIndex
-        );
-      }
-      if (!r.hasUV && r.hasColor) {
-        console.warn(
-          `⚠️ COLOR_0 only (no UV) at mesh ${r.mesh} prim ${r.prim}`
-        );
-      }
-    });
-  }, [gltf]);
-
-  return null;
-}
 
 export default function ProductScreen() {
   const { toggleBookmark, bookmarks } = useBookmark();
@@ -69,9 +38,9 @@ export default function ProductScreen() {
 
   return (
     <>
-      {__DEV__ && product.model3DUrl ? (
+      {/* {__DEV__ && product.model3DUrl ? (
         <GLTFDebugMount uri={product.model3DUrl} name={product.name} />
-      ) : null}
+      ) : null} */}
       <ScrollView f={1} gap={20} bg={"white"} p={20}>
         <Text color={"$color.gray8Dark"} fontWeight={"bold"} fontSize={24}>
           {product.name}
@@ -95,11 +64,6 @@ export default function ProductScreen() {
                   textProps={{ color: "black", fos: 14 }}
                   onPress={() => onViewType(viewType as "THREED" | "AR")}
                 >
-                  {/* <MCIcon
-                    name="arrow-u-left-bottom"
-                    size={20}
-                    color="$pointColor"
-                  /> */}
                   {viewType === "THREED" ? "3D" : "AR"}
                 </Button>
               ))}
