@@ -1,16 +1,25 @@
-import { router, useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams } from "expo-router";
 import useControls from "r3f-native-orbitcontrols";
-import { Suspense, useState } from "react";
+import { Suspense, useCallback, useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { Canvas } from "@react-three/fiber";
-import Trigger from "@/components/3dModel/Trigger";
 import Model from "@/components/3dModel/Model";
 
 export default function THREEDScreen() {
   const { modelUrl } = useLocalSearchParams<{ modelUrl: string }>();
   const [OrbitControls, events] = useControls();
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    setLoading(true);
+  }, [modelUrl]);
 
   return (
     <SafeAreaView>
@@ -23,11 +32,35 @@ export default function THREEDScreen() {
           <directionalLight position={[0, 0, -1]} args={["white", 5]} />
           {/* <directionalLight position={[0, 1, 0]} args={["white", 5]} /> */}
           {/* <directionalLight position={[0, -1, 0]} args={["white", 5]} /> */}
-          <Suspense fallback={<Trigger setLoading={setLoading} />}>
-            <Model modelUrl={modelUrl} />
+
+          <Suspense fallback={null}>
+            <Model
+              key={modelUrl}
+              modelUrl={modelUrl}
+              onLoaded={() => setLoading(false)}
+            />
           </Suspense>
         </Canvas>
+        {/* 로딩 인디케이터 */}
+        {loading && (
+          <View style={styles.overlay}>
+            <ActivityIndicator size="large" />
+          </View>
+        )}
       </View>
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  overlay: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "rgba(0,0,0,0.12)",
+  },
+});

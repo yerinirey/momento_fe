@@ -5,30 +5,25 @@ import { GLTF } from "three-stdlib";
 import { GroupProps } from "@react-three/fiber";
 import { Text } from "tamagui";
 type GLTFResult = GLTF & {
-  nodes: {
-    pasted__model1: THREE.Mesh;
-    pasted__model2: THREE.Mesh;
-    pasted__model3: THREE.Mesh;
-    pasted__model4: THREE.Mesh;
-    pasted__model5: THREE.Mesh;
-    pasted__model6: THREE.Mesh;
-    pasted__model7: THREE.Mesh;
-  };
-  materials: {
-    koltuk: THREE.MeshStandardMaterial;
-    siyah: THREE.MeshStandardMaterial;
-    metal: THREE.MeshStandardMaterial;
-    altin: THREE.MeshStandardMaterial;
-  };
+  nodes: Record<string, THREE.Mesh>;
+  materials: Record<string, THREE.MeshStandardMaterial>;
 };
+
 interface ModelProps extends GroupProps {
   modelUrl: string;
+  onLoaded?: () => void;
 }
 
-export default function Model({ modelUrl, ...props }: ModelProps) {
+export default function Model({ modelUrl, onLoaded, ...props }: ModelProps) {
   const { scene } = useGLTF(modelUrl);
   const [ready, setReady] = useState(false);
   const patched = useRef(false);
+
+  useEffect(() => {
+    patched.current = false;
+    setReady(false);
+  }, [modelUrl]);
+
   useEffect(() => {
     if (patched.current) return;
 
@@ -53,7 +48,8 @@ export default function Model({ modelUrl, ...props }: ModelProps) {
 
     patched.current = true;
     setReady(true);
-  }, [scene]);
+    onLoaded?.();
+  }, [scene, onLoaded]);
 
   return ready ? (
     <primitive object={scene} scale={7} position={[0, -1.4, 0]} {...props} />

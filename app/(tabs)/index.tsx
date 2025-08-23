@@ -91,19 +91,20 @@ export default function Home() {
               생성한 항목
             </Text>
             <XStack gap={0} jc={"space-between"} fw={"wrap"}>
-              {/* {trends.slice(4).map((product) => (
+              {trends.slice(4).map((product) => (
                 <ProductDealCard
                   key={product.id}
                   product={product}
                   onPress={() => onProductPress(product)}
                 />
-              ))} */}
+              ))}
               {/* 디버깅 항목들이 많아서 마지막에 업데이트한 항목만 뜨도록 하드코딩한 상태 */}
-              <ProductDealCard
+              {/* trends fetch 이전에 length입력 시 오류 -> 보류 */}
+              {/* <ProductDealCard
                 key={trends[trends.length - 1].id}
                 product={trends[trends.length - 1]}
                 onPress={() => onProductPress(trends[trends.length - 1])}
-              />
+              /> */}
             </XStack>
           </>
         ) : (
