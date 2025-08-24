@@ -4,7 +4,7 @@ interface Props {
   product: Product;
 }
 
-export default function ProductCart({ product }: Props) {
+export default function ProductBookMark({ product }: Props) {
   return (
     <YStack gap={10}>
       <XStack bg={"$gray2Light"} minHeight={200} minWidth={"90%"}>

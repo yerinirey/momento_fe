@@ -12,7 +12,7 @@ export default function ScanScreen() {
   const { addGeneratingModel } = useModelGeneration();
   const params = useLocalSearchParams();
   const capturedUrisParam = params?.capturedUris;
-  // 🔄 촬영 결과를 반영
+  // 촬영 결과를 반영
   useEffect(() => {
     if (
       capturedUrisParam &&

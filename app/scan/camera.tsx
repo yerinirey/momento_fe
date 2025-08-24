@@ -237,7 +237,7 @@ export default function CameraScreenNoTF() {
 
           {/* 이미지 카운터 */}
           <View style={[styles.counterContainer, { top: insets.top + 8 }]}>
-            <Text style={styles.counterText}>{capturedUris.length} / 10</Text>
+            <Text style={styles.counterText}>{capturedUris.length} / 20</Text>
           </View>
           {/* 하단 컨트롤 */}
           <View style={[styles.controls, { bottom: insets.bottom + 20 }]}>

@@ -52,7 +52,7 @@ export default function Model({ modelUrl, onLoaded, ...props }: ModelProps) {
   }, [scene, onLoaded]);
 
   return ready ? (
-    <primitive object={scene} scale={7} position={[0, -1.4, 0]} {...props} />
+    <primitive object={scene} scale={3} position={[0, -1.4, 0]} {...props} />
   ) : (
     <></>
   );

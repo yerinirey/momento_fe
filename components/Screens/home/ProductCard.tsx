@@ -7,7 +7,7 @@ interface Props {
   onPress: VoidFunction;
 }
 
-export function ProductDealCard({ product, onPress }: Props) {
+export function ProductCard({ product, onPress }: Props) {
   return (
     <Pressable onPress={onPress}>
       <YStack w={Dimensions.get("window").width / 2 - 40} h={180} gap={10}>

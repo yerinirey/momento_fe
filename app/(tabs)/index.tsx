@@ -1,5 +1,4 @@
-import { HomeSuggestions } from "@/components/Screens/home/HomeSuggestions";
-import { ProductDealCard } from "@/components/Screens/home/ProductDealCard";
+import { ProductCard } from "@/components/Screens/home/ProductCard";
 import { DefaultButton } from "@/components/Shared/DefaultButton";
 import { HeaderTabsProps } from "@/components/Shared/header/HeaderTabs";
 import { useAuth } from "@/context/AuthProvider";
@@ -55,8 +54,6 @@ export default function Home() {
 
   return (
     <ScrollView f={1}>
-      {/* <HomeCarousel /> */}
-      {/* <HomeSuggestions /> */}
       <YStack bg={"white"} w={"100%"} p={16} pt={20} gap={10}>
         {session ? (
           // 임시로 칸을 나눠두기. 카테고리로 추가할 예정인 항목
@@ -66,7 +63,7 @@ export default function Home() {
             </Text>
             <XStack gap={30} jc={"space-between"} fw={"wrap"}>
               {trends.slice(0, 2).map((product) => (
-                <ProductDealCard
+                <ProductCard
                   key={product.id}
                   product={product}
                   onPress={() => onProductPress(product)}
@@ -79,7 +76,7 @@ export default function Home() {
             </Text>
             <XStack gap={30} jc={"space-between"} fw={"wrap"}>
               {trends.slice(2, 4).map((product) => (
-                <ProductDealCard
+                <ProductCard
                   key={product.id}
                   product={product}
                   onPress={() => onProductPress(product)}
@@ -92,7 +89,7 @@ export default function Home() {
             </Text>
             <XStack gap={0} jc={"space-between"} fw={"wrap"}>
               {trends.slice(4).map((product) => (
-                <ProductDealCard
+                <ProductCard
                   key={product.id}
                   product={product}
                   onPress={() => onProductPress(product)}
@@ -100,7 +97,7 @@ export default function Home() {
               ))}
               {/* 디버깅 항목들이 많아서 마지막에 업데이트한 항목만 뜨도록 하드코딩한 상태 */}
               {/* trends fetch 이전에 length입력 시 오류 -> 보류 */}
-              {/* <ProductDealCard
+              {/* <ProductCard
                 key={trends[trends.length - 1].id}
                 product={trends[trends.length - 1]}
                 onPress={() => onProductPress(trends[trends.length - 1])}

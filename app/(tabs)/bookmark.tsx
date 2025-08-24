@@ -1,7 +1,6 @@
-import ProductCart from "@/components/Screens/cart/ProductCart";
+import ProductBookMark from "@/components/Screens/bookmark/ProductBookMark";
 import { HeaderTabsProps } from "@/components/Shared/header/HeaderTabs";
 import { useBookmark } from "@/context/BookmarkProvider";
-import Icon from "@expo/vector-icons/Ionicons";
 import { useNavigation } from "expo-router";
 import { useEffect } from "react";
 import { Alert } from "react-native";
@@ -33,7 +32,7 @@ export default function Cart() {
         </Text>
         {bookmarkedItems.length ? (
           bookmarkedItems.map((item) => (
-            <ProductCart key={item.id} product={item} />
+            <ProductBookMark key={item.id} product={item} />
           ))
         ) : (
           <>
