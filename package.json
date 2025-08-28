@@ -16,7 +16,7 @@
     "@react-native-community/slider": "4.5.5",
     "@react-three/drei": "^9.100.0",
     "@react-three/fiber": "^8.13.5",
-    "@reactvision/react-viro": "^2.43.3",
+    "@reactvision/react-viro": "2.43.3",
     "@supabase/supabase-js": "2.48.1",
     "@tamagui/babel-plugin": "1.121.11",
     "@tamagui/config": "1.121.11",
@@ -41,7 +41,10 @@
     "react-native-webview": "13.12.5",
     "react-native-worklets-core": "^1.6.0",
     "tamagui": "1.121.11",
-    "three": "^0.166.0"
+    "three": "^0.166.0",
+    "expo-notifications": "~0.29.14",
+    "expo-constants": "~17.0.8",
+    "expo-linking": "~7.0.5"
   },
   "devDependencies": {
     "@babel/core": "7.25.2",

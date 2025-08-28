@@ -26,12 +26,12 @@ export default function THREEDScreen() {
       <View style={{ height: "100%" }} {...events}>
         <Canvas events={null as any}>
           <OrbitControls enablePan={false} />
-          <directionalLight position={[1, 0, 0]} args={["white", 5]} />
-          {/* <directionalLight position={[-1, 0, 0]} args={["white", 5]} /> */}
-          <directionalLight position={[0, 0, 1]} args={["white", 5]} />
-          <directionalLight position={[0, 0, -1]} args={["white", 5]} />
-          {/* <directionalLight position={[0, 1, 0]} args={["white", 5]} /> */}
-          {/* <directionalLight position={[0, -1, 0]} args={["white", 5]} /> */}
+          <directionalLight position={[1, 0, 0]} args={["white", 1]} />
+          <directionalLight position={[-1, 0, 0]} args={["white", 1]} />
+          <directionalLight position={[0, 0, 1]} args={["white", 1]} />
+          <directionalLight position={[0, 0, -1]} args={["white", 1]} />
+          <directionalLight position={[0, 1, 0]} args={["white", 1]} />
+          <directionalLight position={[0, -1, 0]} args={["white", 1]} />
 
           <Suspense fallback={null}>
             <Model

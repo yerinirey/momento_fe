@@ -7,9 +7,41 @@ import { YStack, XStack, Button, Text } from "tamagui";
 import { H2, Paragraph } from "tamagui";
 import { useModelGeneration } from "../../context/ModelGenerationProvider";
 import { DefaultButton } from "@/components/Shared/DefaultButton";
+
+/* Notification */
+import * as Notifications from "expo-notifications";
+import { Platform } from "react-native";
+import { supabase } from "@/supabase";
+
+// (앱 어디선가 1회) 알림 핸들러(배너 표시용)
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldSetBadge: false,
+    shouldPlaySound: false,
+  }),
+});
+async function ensureNotificationReady() {
+  const { status: existing } = await Notifications.getPermissionsAsync();
+  if (existing !== "granted") {
+    const { status } = await Notifications.requestPermissionsAsync();
+    if (status !== "granted") {
+      throw new Error("알림 권한이 필요합니다.");
+    }
+  }
+  if (Platform.OS === "android") {
+    await Notifications.setNotificationChannelAsync("default", {
+      name: "default",
+      importance: Notifications.AndroidImportance.DEFAULT,
+    });
+  }
+}
+/* Notification End */
+
 export default function ScanScreen() {
   const [selectedImages, setSelectedImages] = useState<string[]>([]);
   const { addGeneratingModel } = useModelGeneration();
+  const [scheduling, setScheduling] = useState(false);
   const params = useLocalSearchParams();
   const capturedUrisParam = params?.capturedUris;
   // 촬영 결과를 반영
@@ -30,6 +62,7 @@ export default function ScanScreen() {
       }
     }
     router.setParams({ capturedUris: undefined });
+    ensureNotificationReady().catch((e) => console.warn(e.message));
   }, [capturedUrisParam]);
 
   /* 갤러리에서 이미지 선택 */
@@ -49,13 +82,60 @@ export default function ScanScreen() {
   };
 
   /* 이미지 기반으로 생성중 모델 아이템으로 추가 */
-  const generateModel = () => {
-    if (selectedImages.length > 0) {
-      addGeneratingModel(selectedImages[0]);
+  const generateModel = async () => {
+    if (scheduling) return;
+
+    setScheduling(true);
+    if (selectedImages.length === 0) {
+      alert("Please select or capture images first.");
+      return;
+    }
+    const thumbnail = selectedImages[0];
+    try {
+      addGeneratingModel(thumbnail);
+      const { data, error } = await supabase
+        .from("products")
+        .insert([
+          {
+            name: "New Momento",
+            imageUrl: thumbnail,
+            model3DUrl:
+              "https://qysttxnnfsarkobrxkuu.supabase.co/storage/v1/object/public/products/boka_mapped_no_VColor.glb",
+            descriptions: ".",
+          },
+        ])
+        .select()
+        .single();
+
+      if (error) {
+        console.error("Insert Error: ", error);
+        Alert.alert("모델 생성 처리 중 문제가 발생했어요.");
+      } else {
+        await Notifications.cancelAllScheduledNotificationsAsync();
+        const fireAt = new Date(Date.now() + 10_000); // 10초 뒤
+        const id = await Notifications.scheduleNotificationAsync({
+          content: {
+            title: "모델이 생성되었어요 🎉",
+            body: "지금 확인해보세요.",
+            data: {
+              productId: data.id,
+            },
+          },
+          trigger: {
+            type: Notifications.SchedulableTriggerInputTypes.DATE,
+            date: fireAt,
+          },
+        });
+      }
+
       setSelectedImages([]);
       router.navigate("/profile");
-    } else {
-      alert("Please select or capture images first.");
+    } catch (e) {
+      console.error(e);
+
+      Alert.alert("오류", "모델 생성 처리 중 문제가 발생했어요.");
+    } finally {
+      setScheduling(false);
     }
   };
 

@@ -221,7 +221,7 @@ export default function ARScreen() {
           <View style={styles.modalCard}>
             <RNText style={styles.modalTitle}>배치 안내</RNText>
             <RNText style={styles.modalBody}>
-              화면을 탭하면 현재 카메라 전방 1m 지점에 모델을 배치합니다.
+              화면을 탭하면 현재 카메라 전방 지점에 모델을 배치합니다.
             </RNText>
             <Pressable
               style={styles.modalBtn}
@@ -247,7 +247,7 @@ export default function ARScreen() {
               step={step}
               value={scale}
               onValueChange={setScale}
-              minimumTrackTintColor="#C68EFD"
+              minimumTrackTintColor="#f99101"
               maximumTrackTintColor="#999999"
             />
             <RNText style={styles.scaleValue}>{scale.toFixed(2)}x</RNText>

@@ -5,11 +5,13 @@ import { Product } from "@/types/product";
 import { router, useLocalSearchParams } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import { Button, Image, ScrollView, Text, XStack, YStack } from "tamagui";
-
+import Icon from "@expo/vector-icons/Ionicons";
 export default function ProductScreen() {
   const { toggleBookmark, bookmarks } = useBookmark();
   const { id } = useLocalSearchParams();
   const [product, setProduct] = useState<Product | null>(null);
+  const [isLiked, setIsLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState(0);
   const fetchProducts = useCallback(async () => {
     try {
       const { data = null } = await supabase
@@ -36,6 +38,15 @@ export default function ProductScreen() {
   if (!product) return null;
   const isBookmarked = product.id in bookmarks;
 
+  const handleLikeToggle = () => {
+    if (isLiked) {
+      setLikeCount((prev) => prev - 1);
+    } else {
+      setLikeCount((prev) => prev + 1);
+    }
+    setIsLiked((prev) => !prev);
+  };
+
   return (
     <>
       {/* {__DEV__ && product.model3DUrl ? (
@@ -45,7 +56,19 @@ export default function ProductScreen() {
         <Text color={"$color.gray8Dark"} fontWeight={"bold"} fontSize={24}>
           {product.name}
         </Text>
-        <Text>{product.created_at.split("T")[0]} 생성</Text>
+        <XStack jc="space-between" ai="center">
+          <Text>{product.created_at.split("T")[0]} 생성</Text>
+
+          <XStack ai="center" gap={6}>
+            <Icon
+              name={isLiked ? "heart" : "heart-outline"}
+              size={24}
+              color={isLiked ? "#d35313" : "gray"}
+              onPress={handleLikeToggle}
+            />
+            <Text>{likeCount}</Text>
+          </XStack>
+        </XStack>
         <Image
           source={{ uri: product.imageUrl ?? "" }}
           h={300}

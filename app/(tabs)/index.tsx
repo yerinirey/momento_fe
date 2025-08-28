@@ -87,21 +87,24 @@ export default function Home() {
             <Text als={"flex-start"} fos={20} fow={"bold"}>
               생성한 항목
             </Text>
+
             <XStack gap={0} jc={"space-between"} fw={"wrap"}>
-              {trends.slice(4).map((product) => (
+              {trends
+                .filter((product) => product.name === "New Momento") // 공모전 영상용 하드코딩
+                .map((product) => (
+                  <ProductCard
+                    key={product.id}
+                    product={product}
+                    onPress={() => onProductPress(product)}
+                  />
+                ))}
+              {/* {trends.slice(4).map((product) => (
                 <ProductCard
                   key={product.id}
                   product={product}
                   onPress={() => onProductPress(product)}
                 />
-              ))}
-              {/* 디버깅 항목들이 많아서 마지막에 업데이트한 항목만 뜨도록 하드코딩한 상태 */}
-              {/* trends fetch 이전에 length입력 시 오류 -> 보류 */}
-              {/* <ProductCard
-                key={trends[trends.length - 1].id}
-                product={trends[trends.length - 1]}
-                onPress={() => onProductPress(trends[trends.length - 1])}
-              /> */}
+              ))} */}
             </XStack>
           </>
         ) : (

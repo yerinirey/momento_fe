@@ -259,7 +259,7 @@ const styles = StyleSheet.create({
     width: 12,
     height: 12,
     borderRadius: 6,
-    backgroundColor: "#C68EFD",
+    backgroundColor: "#f99101",
   },
   bubbleHint: { marginTop: 6, color: "white", fontSize: 12, opacity: 0.85 },
 

@@ -6,7 +6,11 @@ import { Text, XStack, YStack } from "tamagui";
 
 interface Tab {
   name: string;
-  icon: "home-outline" | "account-outline" | "bookmark-outline" | "camera-outline";
+  icon:
+    | "home-outline"
+    | "account-outline"
+    | "bookmark-outline"
+    | "camera-outline";
 }
 export default function TabLayout() {
   const { bookmarkedItems } = useBookmark();
@@ -55,13 +59,13 @@ export default function TabLayout() {
                   width={50}
                   height={4}
                   borderRadius={20}
-                  bg={focused ? "#8F87F1" : "$colorTransparent"}
+                  bg={focused ? "#f99101" : "$colorTransparent"}
                 />
 
                 <MCIcon
                   name={tab.icon}
                   size={30}
-                  color={focused ? "#8F87F1" : "black"}
+                  color={focused ? "#f99101" : "black"}
                 />
 
                 {tab.name === "bookmark" && (
@@ -74,7 +78,7 @@ export default function TabLayout() {
                     fow={"bold"}
                     fos={14}
                     // col={focused ? "#8F87F1" : "black"}
-                    col="#8F87F1"
+                    col="#f99101"
                   >
                     {bookmarkedItems.length}
                   </Text>

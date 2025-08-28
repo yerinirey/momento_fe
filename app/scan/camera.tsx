@@ -249,7 +249,7 @@ export default function CameraScreenNoTF() {
                 takePhoto();
               }}
               iconName="camera-outline"
-              bgColor="#C68EFD "
+              bgColor="#f99101 "
             />
             <CameraSceneButton
               onPress={() => router.back()}
@@ -314,7 +314,7 @@ const styles = StyleSheet.create({
     // width: SCREEN_W * 0.55,
     // height: SCREEN_W * 0.55,
     borderWidth: 2,
-    borderColor: "#C68EFD",
+    borderColor: "#f99101",
     borderRadius: 12,
     backgroundColor: "transparent",
   },

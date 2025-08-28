@@ -118,7 +118,7 @@ export default function Profile() {
         <Sheet.Handle />
         <Sheet.Frame p={20} gap={20} minHeight={120}>
           <Text>{session?.user.email}</Text>
-          <Button textProps={{ fos: 18 }} bg={"#FED2E2"} onPress={signOut}>
+          <Button textProps={{ fos: 18 }} bg={"#d35313"} onPress={signOut}>
             로그아웃
           </Button>
         </Sheet.Frame>
