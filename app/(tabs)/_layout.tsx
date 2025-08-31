@@ -6,6 +6,7 @@ import { Text, XStack, YStack } from "tamagui";
 
 interface Tab {
   name: string;
+  viewName: string;
   icon:
     | "home-outline"
     | "account-outline"
@@ -13,22 +14,25 @@ interface Tab {
     | "camera-outline";
 }
 export default function TabLayout() {
-  const { bookmarkedItems } = useBookmark();
   const tabs: Tab[] = [
     {
       name: "index",
+      viewName: "Home",
       icon: "home-outline",
     },
     {
       name: "scan",
+      viewName: "Scan",
       icon: "camera-outline",
     },
     {
       name: "profile",
+      viewName: "My Page",
       icon: "account-outline",
     },
     {
       name: "bookmark",
+      viewName: "Bookmarks",
       icon: "bookmark-outline",
     },
   ];
@@ -40,49 +44,39 @@ export default function TabLayout() {
           key={tab.name}
           name={tab.name}
           options={{
-            tabBarStyle: {
-              borderTopWidth: 1,
-              borderTopColor: "lightgray",
-            },
-            // TODO: Custom header
             header: (props: any) => <Header {...props} />,
-            tabBarLabel: () => null,
+            tabBarLabel: tab.viewName,
+            tabBarActiveTintColor: "#f99101",
+            tabBarInactiveTintColor: "grey",
+            tabBarLabelStyle: {
+              fontSize: 12, // 글자 크기 고정
+              lineHeight: 14, // 줄간격 통일
+              fontWeight: "500",
+              marginTop: 2,
+              textTransform: "none",
+            },
+            tabBarStyle: {
+              height: 60,
+              paddingBottom: 10,
+              paddingTop: 5,
+            },
             tabBarIcon: ({ focused }) => (
-              <YStack
-                f={1}
-                marginTop={-5}
-                gap={10}
-                jc={"space-between"}
-                ai={"center"}
-              >
-                <XStack
-                  width={50}
-                  height={4}
-                  borderRadius={20}
-                  bg={focused ? "#f99101" : "$colorTransparent"}
-                />
-
+              <YStack f={1} jc={"space-between"} ai={"center"}>
                 <MCIcon
                   name={tab.icon}
-                  size={30}
-                  color={focused ? "#f99101" : "black"}
+                  size={28}
+                  color={focused ? "#f99101" : "grey"}
                 />
 
-                {tab.name === "bookmark" && (
-                  <Text
-                    paddingVertical={4}
-                    borderRadius={10}
-                    position="absolute"
-                    top={11}
-                    backgroundColor={"white"}
-                    fow={"bold"}
-                    fos={14}
-                    // col={focused ? "#8F87F1" : "black"}
-                    col="#f99101"
-                  >
-                    {bookmarkedItems.length}
-                  </Text>
-                )}
+                <Text
+                  fontSize={14}
+                  lineHeight={16}
+                  adjustsFontSizeToFit
+                  numberOfLines={1}
+                  color={focused ? "#f99101" : "grey"}
+                >
+                  {/* {tab.viewName} */}
+                </Text>
               </YStack>
             ),
           }}

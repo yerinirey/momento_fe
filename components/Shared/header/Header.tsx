@@ -25,6 +25,13 @@ export interface TabsHeaderProps extends BottomTabHeaderProps {
 
 export function Header({ options }: StackHeaderProps | TabsHeaderProps) {
   const edgeInsets = useSafeAreaInsets();
+  const render = (slot?: any) => {
+    if (!slot) return null;
+    // 함수라면 실행해서 ReactNode 반환
+    if (typeof slot === "function") return slot({});
+    // 이미 ReactNode라면 그대로 렌더
+    return slot;
+  };
 
   if (options.headerLeft || options.headerTitle || options.headerRight) {
     return (
@@ -37,15 +44,15 @@ export function Header({ options }: StackHeaderProps | TabsHeaderProps) {
           mt={edgeInsets.top + 10}
         >
           <YStack key="headerLeft" f={1}>
-            {options.headerLeft && <options.headerLeft />}
+            {render(options.headerLeft)}
           </YStack>
           <YStack key="headerTitle" f={1}>
             {/* @ts-ignore */}
-            {options.headerTitle && <options.headerTitle />}
+            {render(options.headerTitle)}
           </YStack>
           <YStack key="headerRight" f={1}>
             {/* @ts-ignore */}
-            {options.headerRight && <options.headerRight />}
+            {render(options.headerRight)}
           </YStack>
         </XStack>
       </YStack>

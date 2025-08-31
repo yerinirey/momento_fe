@@ -5,16 +5,27 @@ import { Image, XStack, YStack } from "tamagui";
 interface Props {
   product: Product;
   onPress: VoidFunction;
+  variant?: "list" | "grid";
 }
 
-export function ProductCard({ product, onPress }: Props) {
+export function ProductCard({ product, onPress, variant = "grid" }: Props) {
+  const cardWidth = variant === "grid" ? "48%" : "100%";
   return (
     <Pressable onPress={onPress}>
-      <YStack w={Dimensions.get("window").width / 2 - 40} h={180} gap={10}>
-        <XStack p={5} bg={"$shadowColor"} w={"100%"} h={"80%"} br={4}>
+      <YStack height={Dimensions.get("window").width * 0.8} gap={8}>
+        <XStack
+          bg={"$shadowColor"}
+          w={"100%"}
+          // h={"100%"}
+          {...(variant === "list"
+            ? { aspectRatio: 16 / 9 }
+            : { aspectRatio: 1 })}
+          br={10}
+          overflow="hidden"
+        >
           <Image
             src={product.imageUrl ?? ""}
-            objectFit="contain"
+            objectFit="cover"
             w={"100%"}
             h={"100%"}
           />
