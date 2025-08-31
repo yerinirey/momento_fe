@@ -11,11 +11,8 @@ import { ScrollView, Text, XStack, YStack } from "tamagui";
 
 export default function Home() {
   const navigation = useNavigation();
-  const { session } = useAuth();
 
   const [trends, setTrends] = useState<Product[]>([]);
-
-  const onClickAuth = () => router.push("/login");
   const tabs: HeaderTabsProps["tabs"] = [
     {
       active: true,
@@ -55,66 +52,56 @@ export default function Home() {
   return (
     <ScrollView f={1}>
       <YStack bg={"white"} w={"100%"} p={16} pt={20} gap={10}>
-        {session ? (
-          // 임시로 칸을 나눠두기. 카테고리로 추가할 예정인 항목
-          <>
-            <Text als={"flex-start"} fos={20} fow={"bold"}>
-              프리뷰 카테고리 1
-            </Text>
-            <XStack gap={30} jc={"space-between"} fw={"wrap"}>
-              {trends.slice(0, 2).map((product) => (
-                <ProductCard
-                  key={product.id}
-                  product={product}
-                  onPress={() => onProductPress(product)}
-                />
-              ))}
-            </XStack>
-            <YStack borderBottomWidth={1} borderColor="#c58efd69" />
-            <Text als={"flex-start"} fos={20} fow={"bold"}>
-              프리뷰 카테고리 2
-            </Text>
-            <XStack gap={30} jc={"space-between"} fw={"wrap"}>
-              {trends.slice(2, 4).map((product) => (
-                <ProductCard
-                  key={product.id}
-                  product={product}
-                  onPress={() => onProductPress(product)}
-                />
-              ))}
-            </XStack>
-            <YStack borderBottomWidth={1} borderColor="#c58efd69" />
-            <Text als={"flex-start"} fos={20} fow={"bold"}>
-              생성한 항목
-            </Text>
+        <>
+          <Text als={"flex-start"} fos={20} fow={"bold"}>
+            프리뷰 카테고리 1
+          </Text>
+          <XStack gap={30} jc={"space-between"} fw={"wrap"}>
+            {trends.slice(0, 2).map((product) => (
+              <ProductCard
+                key={product.id}
+                product={product}
+                onPress={() => onProductPress(product)}
+              />
+            ))}
+          </XStack>
+          <YStack borderBottomWidth={1} borderColor="#c58efd69" />
+          <Text als={"flex-start"} fos={20} fow={"bold"}>
+            프리뷰 카테고리 2
+          </Text>
+          <XStack gap={30} jc={"space-between"} fw={"wrap"}>
+            {trends.slice(2, 4).map((product) => (
+              <ProductCard
+                key={product.id}
+                product={product}
+                onPress={() => onProductPress(product)}
+              />
+            ))}
+          </XStack>
+          <YStack borderBottomWidth={1} borderColor="#c58efd69" />
+          <Text als={"flex-start"} fos={20} fow={"bold"}>
+            생성한 항목
+          </Text>
 
-            <XStack gap={0} jc={"space-between"} fw={"wrap"}>
-              {trends
-                .filter((product) => product.name === "New Momento") // 공모전 영상용 하드코딩
-                .map((product) => (
-                  <ProductCard
-                    key={product.id}
-                    product={product}
-                    onPress={() => onProductPress(product)}
-                  />
-                ))}
-              {/* {trends.slice(4).map((product) => (
+          <XStack gap={0} jc={"space-between"} fw={"wrap"}>
+            {trends
+              .filter((product) => product.name === "New Momento") // 공모전 영상용 하드코딩
+              .map((product) => (
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  onPress={() => onProductPress(product)}
+                />
+              ))}
+            {/* {trends.slice(4).map((product) => (
                 <ProductCard
                   key={product.id}
                   product={product}
                   onPress={() => onProductPress(product)}
                 />
               ))} */}
-            </XStack>
-          </>
-        ) : (
-          <>
-            <Text als={"flex-start"} fos={20} fow={"bold"}>
-              로그인하고 모멘토를 둘러보세요.
-            </Text>
-            <DefaultButton onPress={onClickAuth}>로그인</DefaultButton>
-          </>
-        )}
+          </XStack>
+        </>
       </YStack>
     </ScrollView>
   );
