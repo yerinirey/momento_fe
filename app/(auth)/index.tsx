@@ -1,13 +1,6 @@
 import { useState } from "react";
-import {
-  Alert,
-  Platform,
-  Text,
-  TextInput,
-  View,
-  Pressable,
-  ActivityIndicator,
-} from "react-native";
+import { Alert, Platform, ActivityIndicator } from "react-native";
+import { View, Text, Input, Button, XStack } from "tamagui";
 import { supabase } from "@/supabase";
 import { useAuth } from "@/context/AuthProvider";
 import { useRouter } from "expo-router";
@@ -105,118 +98,134 @@ export default function AuthIndex() {
   }
 
   return (
-    <View style={{ flex: 1, paddingHorizontal: 20, paddingTop: 80, gap: 16 }}>
-      <Text style={{ fontSize: 26, fontWeight: "700" }}>Momento</Text>
-      <Text style={{ fontSize: 16, opacity: 0.8 }}>
+    <View bg={"$bgColor"} pt={80} paddingHorizontal={20} flex={1}>
+      <Text fontSize={28} fontWeight={"bold"}>
+        Momento
+      </Text>
+      <Text fontSize={16} opacity={0.8} mt={8}>
         3D 모델을 만들고, AR로 추억을 배치해 보세요.
       </Text>
 
       {/* 이메일/비밀번호 로그인 */}
-      <View style={{ gap: 8, marginTop: 24 }}>
-        <Text style={{ fontSize: 14 }}>이메일</Text>
-        <TextInput
+      <View gap={10} mt={24}>
+        <Text fontSize={14}>이메일</Text>
+        <Input
           value={email}
           onChangeText={setEmail}
           placeholder="you@example.com"
           autoCapitalize="none"
           keyboardType="email-address"
-          style={{
-            borderWidth: 1,
-            borderColor: "#ddd",
-            borderRadius: 12,
-            paddingHorizontal: 14,
-            paddingVertical: 12,
-          }}
+          borderWidth={1}
+          borderColor={"#e8e8e8"}
+          backgroundColor={"#fffeff"}
+          borderRadius={12}
+          paddingHorizontal={14}
+          paddingVertical={12}
         />
 
-        <Text style={{ fontSize: 14, marginTop: 8 }}>비밀번호</Text>
-        <TextInput
+        <Text fontSize={14} mt={10}>
+          비밀번호
+        </Text>
+        <Input
           value={password}
           onChangeText={setPassword}
           placeholder="••••••••"
           secureTextEntry
-          style={{
-            borderWidth: 1,
-            borderColor: "#ddd",
-            borderRadius: 12,
-            paddingHorizontal: 14,
-            paddingVertical: 12,
-          }}
+          borderWidth={1}
+          borderColor={"#e8e8e8"}
+          backgroundColor={"#fffeff"}
+          borderRadius={12}
+          paddingHorizontal={14}
+          paddingVertical={12}
         />
 
-        <Pressable
+        <Button
           disabled={!email || !password || signingIn}
           onPress={handleEmailPasswordSignIn}
-          style={{
-            backgroundColor: !email || !password || signingIn ? "#ccc" : "#000",
-            borderRadius: 12,
-            paddingVertical: 14,
-            alignItems: "center",
-            marginTop: 12,
-          }}
+          backgroundColor={
+            !email || !password || signingIn ? "#fffeff" : "#1d1d1d"
+          }
+          borderWidth={1}
+          borderColor={"#e8e8e8"}
+          borderRadius={12}
+          alignItems="center"
+          textAlign="center"
+          justifyContent="center"
+          mt={20}
+          // paddingVertical={14}
         >
           {signingIn ? (
             <ActivityIndicator />
           ) : (
-            <Text style={{ color: "white", fontWeight: "600" }}>로그인</Text>
+            <Text
+              color={!email || !password || signingIn ? "#1d1d1d" : "#fffeff"}
+              fontWeight="bold"
+            >
+              로그인
+            </Text>
           )}
-        </Pressable>
-        <Pressable
+        </Button>
+        <Button
           onPress={() => router.push("/signup")}
-          style={{
-            borderWidth: 1,
-            borderColor: "#ddd",
-            borderRadius: 12,
-            paddingVertical: 14,
-            alignItems: "center",
-            marginTop: 20,
-          }}
+          backgroundColor={"#fffeff"}
+          borderWidth={1}
+          borderColor={"#e8e8e8"}
+          borderRadius={12}
+          alignItems="center"
+          textAlign="center"
+          justifyContent="center"
+          mt={6}
         >
-          <Text style={{ fontWeight: "600" }}>회원가입</Text>
-        </Pressable>
+          <Text fontWeight={"bold"}>회원가입</Text>
+        </Button>
       </View>
-
-      {/* OAuth 버튼들 (선택) */}
-      <View style={{ gap: 12, marginTop: 16 }}>
-        <Pressable
+      <XStack
+        borderWidth={0.2}
+        borderColor={"$black025"}
+        marginHorizontal={10}
+        marginVertical={24}
+      />
+      {/* OAuth 버튼들 (선택) -> 아이콘으로 4분할 예정*/}
+      <View gap={10}>
+        <Button
           onPress={signInWithGoogle}
-          style={{
-            borderWidth: 1,
-            borderColor: "#ddd",
-            borderRadius: 12,
-            paddingVertical: 14,
-            alignItems: "center",
-          }}
+          borderWidth={1}
+          backgroundColor={"#fffeff"}
+          borderColor={"#e8e8e8"}
+          borderRadius={12}
+          alignItems="center"
+          textAlign="center"
+          justifyContent="center"
         >
           {oauthLoading === "google" ? (
             <ActivityIndicator />
           ) : (
             <Text style={{ fontWeight: "600" }}>Google로 계속하기</Text>
           )}
-        </Pressable>
+        </Button>
 
         {Platform.OS === "ios" && (
-          <Pressable
+          <Button
             onPress={signInWithApple}
-            style={{
-              borderWidth: 1,
-              borderColor: "#ddd",
-              borderRadius: 12,
-              paddingVertical: 14,
-              alignItems: "center",
-            }}
+            borderWidth={1}
+            backgroundColor={"#fffeff"}
+            borderColor={"#e8e8e8"}
+            borderRadius={12}
+            alignItems="center"
+            textAlign="center"
+            justifyContent="center"
           >
             {oauthLoading === "apple" ? (
               <ActivityIndicator />
             ) : (
-              <Text style={{ fontWeight: "600" }}>Apple로 계속하기</Text>
+              <Text fontWeight={"bold"}>Apple로 계속하기</Text>
             )}
-          </Pressable>
+          </Button>
         )}
       </View>
 
-      <View style={{ marginTop: "auto", marginBottom: 24 }}>
-        <Text style={{ fontSize: 12, color: "#666", textAlign: "center" }}>
+      <View mt={"auto"} mb={24}>
+        <Text fontSize={12} color="#1d1d1d" opacity={0.8} textAlign="center">
           계속하면 이용약관 및 개인정보처리방침에 동의하는 것으로 간주됩니다.
         </Text>
       </View>

@@ -1,11 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import {
-  Animated,
-  LayoutChangeEvent,
-  Pressable,
-  StyleSheet,
-  View,
-} from "react-native";
+import { Animated, Pressable, StyleSheet, View } from "react-native";
 import MCIcon from "@expo/vector-icons/MaterialCommunityIcons";
 import { XStack } from "tamagui";
 
@@ -118,13 +112,15 @@ const s = StyleSheet.create({
   btnContainer: {
     borderRadius: 999, // 상한..
     // 글래스모피즘 구현 위한 부분
-    backgroundColor: "rgba(255, 255, 255, 0.2)", // 유리
-    boxShadow: "0 8px 32px 0 rgba(134, 106, 156, 0.37)",
+    backgroundColor: "rgba(249, 145, 1, 0.3)", // 유리
+    // boxShadow: "0 8px 32px 0 rgba(134, 106, 156, 0.37)",
+    shadowColor: "rgba(255, 244, 89, 0.88)",
+    shadowOpacity: 0.2,
+    shadowOffset: { width: 0, height: 8 },
+    shadowRadius: 32,
+    elevation: 8,
     borderWidth: 1,
     borderColor: "rgba(255,255,255,0.18)",
-
-    // Android
-    elevation: 2,
   },
   btnContainer2: {
     flex: 1,

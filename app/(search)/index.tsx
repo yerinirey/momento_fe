@@ -35,7 +35,7 @@ export default function SearchScreen() {
   }, [getProducts]);
 
   return (
-    <YStack f={1} bg={"white"}>
+    <YStack f={1} bg={"$bgColor"}>
       <FlatList
         data={products}
         style={{ padding: 20 }}

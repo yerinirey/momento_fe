@@ -39290,6 +39290,13 @@
           "name": "c-color-pointColor",
           "val": "#f99101",
           "variable": ""
+        },
+        "bgColor": {
+          "isVar": true,
+          "key": "$bgColor",
+          "name": "c-color-bgColor",
+          "val": "#FEECEB",
+          "variable": ""
         }
       },
       "radius": {
@@ -41723,6 +41730,13 @@
         "key": "$pointColor",
         "name": "c-color-pointColor",
         "val": "#f99101",
+        "variable": ""
+      },
+      "$color.bgColor": {
+        "isVar": true,
+        "key": "$bgColor",
+        "name": "c-color-bgColor",
+        "val": "#FEECEB",
         "variable": ""
       },
       "$radius.0": {

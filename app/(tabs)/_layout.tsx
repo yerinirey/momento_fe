@@ -1,14 +1,11 @@
 import { Header } from "@/components/Shared/header/Header";
-import { useBookmark } from "@/context/BookmarkProvider";
 import MCIcon from "@expo/vector-icons/MaterialCommunityIcons";
-import { animations } from "@tamagui/config/v3";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Tabs } from "expo-router";
-import { Pressable } from "react-native-gesture-handler";
-import { Text, XStack, YStack } from "tamagui";
+import { View, YStack } from "tamagui";
 
 interface Tab {
   name: string;
-  viewName: string;
   icon:
     | "home-outline"
     | "account-outline"
@@ -19,30 +16,54 @@ export default function TabLayout() {
   const tabs: Tab[] = [
     {
       name: "index",
-      viewName: "Home",
       icon: "home-outline",
     },
     {
       name: "scan",
-      viewName: "Scan",
       icon: "camera-outline",
     },
     {
       name: "profile",
-      viewName: "My Page",
       icon: "account-outline",
     },
     {
       name: "bookmark",
-      viewName: "Bookmarks",
       icon: "bookmark-outline",
     },
   ];
 
+  const insets = useSafeAreaInsets();
   return (
     <Tabs
       screenOptions={{
-        animation: "fade",
+        tabBarShowLabel: false,
+        tabBarStyle: {
+          position: "absolute",
+          left: 0,
+          right: 0,
+          bottom: 0,
+          height: 60,
+          borderTopWidth: 0,
+          borderTopLeftRadius: 20,
+          borderTopRightRadius: 20,
+          backgroundColor: "transparent",
+          overflow: "hidden",
+
+          shadowColor: "#000000ff",
+          shadowOpacity: 0.08,
+          shadowOffset: { width: 0, height: -2 },
+          shadowRadius: 8,
+          elevation: 8,
+        },
+        tabBarItemStyle: {
+          height: 56,
+          justifyContent: "center",
+          alignItems: "center",
+          flexDirection: "row",
+        },
+        tabBarBackground: () => (
+          <View style={{ flex: 1, backgroundColor: "#feeceb" }} />
+        ),
       }}
     >
       {tabs.map((tab) => (
@@ -51,39 +72,16 @@ export default function TabLayout() {
           name={tab.name}
           options={{
             header: (props: any) => <Header {...props} />,
-            tabBarLabel: tab.viewName,
             tabBarActiveTintColor: "#f99101",
             tabBarInactiveTintColor: "grey",
-            tabBarLabelStyle: {
-              fontSize: 12, // 글자 크기 고정
-              lineHeight: 14, // 줄간격 통일
-              fontWeight: "500",
-              marginTop: 2,
-              textTransform: "none",
-            },
-            tabBarStyle: {
-              height: 60,
-              paddingBottom: 10,
-              paddingTop: 5,
-            },
 
             tabBarIcon: ({ focused }) => (
-              <YStack f={1} jc={"space-between"} ai={"center"}>
+              <YStack f={1} jc={"center"} ai={"center"}>
                 <MCIcon
                   name={tab.icon}
                   size={28}
                   color={focused ? "#f99101" : "grey"}
                 />
-
-                <Text
-                  fontSize={14}
-                  lineHeight={16}
-                  adjustsFontSizeToFit
-                  numberOfLines={1}
-                  color={focused ? "#f99101" : "grey"}
-                >
-                  {/* {tab.viewName} */}
-                </Text>
               </YStack>
             ),
           }}

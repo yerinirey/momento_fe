@@ -34,7 +34,7 @@ export default function Profile() {
   return (
     <>
       <ScrollView
-        bg={"white"}
+        bg={"$bgColor"}
         contentContainerStyle={{
           alignItems: "center", // x축 중앙 정렬 (flex레이아웃이 아니라고 함)
         }}
@@ -153,10 +153,14 @@ const s = StyleSheet.create({
     borderRadius: 12,
     padding: 16,
 
-    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
-    shadowOpacity: 10,
-
-    shadowOffset: { width: 0, height: 20 },
+    // boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
+    // boxShadow는 RN네이티브에서 사용 불가능, 대체
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
     shadowRadius: 12,
+    shadowOpacity: 0.08,
+
+    // android Shadow
+    elevation: 4,
   },
 });

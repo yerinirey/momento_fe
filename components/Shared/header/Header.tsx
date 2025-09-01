@@ -41,7 +41,8 @@ export function Header({ options }: StackHeaderProps | TabsHeaderProps) {
 
   if (options.headerLeft || options.headerTitle || options.headerRight) {
     return (
-      <YStack bg={"$pointColor"}>
+      // <YStack bg={"$pointColor"}>
+      <YStack bg={"$bgColor"}>
         <XStack
           jc={"space-between"}
           py={10}
@@ -68,13 +69,9 @@ export function Header({ options }: StackHeaderProps | TabsHeaderProps) {
     );
   }
   return (
-    <YStack bg="$pointColor">
-      <YStack
-        bg="$colorTransparent"
-        gap={20}
-        pb={10}
-        marginTop={edgeInsets.top + 10}
-      >
+    // <YStack bg={"$pointColor"}>
+    <YStack bg={"$bgColor"}>
+      <YStack bg="$bgColor" gap={20} pb={10} marginTop={edgeInsets.top + 10}>
         <XStack px={14} jc="flex-end" ai="center">
           {options.headerSearchShown && <HeaderSearch />}
           {/* 좌: 검색 아이콘 */}

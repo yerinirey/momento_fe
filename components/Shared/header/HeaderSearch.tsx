@@ -61,7 +61,7 @@ export function HeaderSearch() {
         onChangeText={setQuery}
         textAlign="left"
         placeholder="모멘토를 검색하세요" // 추후 추천 키워드 도입 가능
-        placeholderTextColor={"rgba(240, 232, 227, 1)"}
+        placeholderTextColor={"#1d1d1d"}
       />
     </XStack>
   );
@@ -75,7 +75,7 @@ const s = StyleSheet.create({
     justifyContent: "center",
   },
   icon: {
-    color: "rgba(255,255,255,0.85)",
+    color: "#f99201ff",
     fontSize: 26,
     textShadowColor: " rgba(255, 246, 164, 0.68)",
     textShadowOffset: { width: 0, height: 0 },
@@ -83,9 +83,8 @@ const s = StyleSheet.create({
   },
   input: {
     paddingLeft: 10,
-    backgroundColor: "rgba(255, 255, 255, 0.2)", // 유리
+    backgroundColor: "#fffeff",
     borderColor: "rgba(255,255,255,0.18)",
     borderWidth: 1,
-    boxShadow: "0 8px 32px 0 rgba(134, 106, 156, 0.37)",
   },
 });

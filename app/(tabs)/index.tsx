@@ -1,12 +1,8 @@
 import { ProductCard } from "@/components/Screens/home/ProductCard";
-import { DefaultButton } from "@/components/Shared/DefaultButton";
-import { HeaderTabsProps } from "@/components/Shared/header/HeaderTabs";
-import { useAuth } from "@/context/AuthProvider";
 import { supabase } from "@/supabase";
 import { Product } from "@/types/product";
 import { router, useNavigation } from "expo-router";
 import { useCallback, useEffect, useLayoutEffect, useState } from "react";
-import { Alert } from "react-native";
 import { ScrollView, Text, XStack, YStack } from "tamagui";
 
 type ViewMode = "list" | "grid";
@@ -49,8 +45,8 @@ export default function Home() {
   }, [getTrend]);
 
   return (
-    <ScrollView f={1}>
-      <YStack bg={"white"} w={"100%"} px={14} pt={20}>
+    <ScrollView f={1} bg={"$bgColor"}>
+      <YStack w={"100%"} px={14} pt={20}>
         {viewMode === "grid" ? (
           <XStack gap={12} jc="flex-start" fw="wrap">
             {products.map((product) => (
