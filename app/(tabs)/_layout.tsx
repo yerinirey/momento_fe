@@ -1,7 +1,9 @@
 import { Header } from "@/components/Shared/header/Header";
 import { useBookmark } from "@/context/BookmarkProvider";
 import MCIcon from "@expo/vector-icons/MaterialCommunityIcons";
+import { animations } from "@tamagui/config/v3";
 import { Tabs } from "expo-router";
+import { Pressable } from "react-native-gesture-handler";
 import { Text, XStack, YStack } from "tamagui";
 
 interface Tab {
@@ -38,7 +40,11 @@ export default function TabLayout() {
   ];
 
   return (
-    <Tabs>
+    <Tabs
+      screenOptions={{
+        animation: "fade",
+      }}
+    >
       {tabs.map((tab) => (
         <Tabs.Screen
           key={tab.name}
@@ -60,6 +66,7 @@ export default function TabLayout() {
               paddingBottom: 10,
               paddingTop: 5,
             },
+
             tabBarIcon: ({ focused }) => (
               <YStack f={1} jc={"space-between"} ai={"center"}>
                 <MCIcon

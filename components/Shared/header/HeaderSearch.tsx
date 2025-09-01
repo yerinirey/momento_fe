@@ -2,7 +2,7 @@ import { useDebouncedCallback } from "@/hooks/useDebouncedCallback";
 import Icon from "@expo/vector-icons/Ionicons";
 import { router, useSegments } from "expo-router";
 import { useRef, useState } from "react";
-import { Pressable } from "react-native";
+import { Pressable, StyleSheet } from "react-native";
 import { Input, XStack } from "tamagui";
 
 export function HeaderSearch() {
@@ -36,8 +36,8 @@ export function HeaderSearch() {
     // 기본 탭에서는 아이콘만 보일 수 있도록 분기
     return (
       <XStack px={14} jc="flex-end" ai="center">
-        <Pressable onPress={onPressIn} hitSlop={8}>
-          <Icon name="search" color="#000" size={22} />
+        <Pressable onPress={onPressIn} hitSlop={8} style={s.btnContainer}>
+          <Icon name="search" style={s.icon} />
         </Pressable>
       </XStack>
     );
@@ -47,39 +47,45 @@ export function HeaderSearch() {
     <XStack px={20} jc={"center"} ai={"center"} gap={10}>
       {isSearchScreen && (
         <Pressable onPress={onGoBack}>
-          <Icon name="arrow-back" color={"black"} size={24} />
+          <Icon name="arrow-back" style={s.icon} />
         </Pressable>
       )}
 
-      <XStack
-        bg={"white"}
+      <Icon name="search" style={s.icon} />
+      <Input
+        style={s.input}
         f={9}
-        jc={"center"}
-        ai={"center"}
-        bw={1}
-        bc={"#a4a5a6"}
-        br={8}
-        shac={"gray"}
-        shof={{ width: 0, height: 2 }}
-        shop={0.4}
-        shar={4}
-      >
-        <Icon name="search" color={"black"} size={24} />
-        <Input
-          ref={ref}
-          value={query}
-          // editable={isSearchScreen}
-          onPressIn={onPressIn}
-          onChangeText={setQuery}
-          w={"75%"}
-          bg={"white"}
-          fow={800}
-          fos={20}
-          bw={0}
-          placeholder="Search"
-          // pointerEvents={isSearchScreen ? "auto" : "none"}
-        />
-      </XStack>
+        ref={ref}
+        value={query}
+        onPressIn={onPressIn}
+        onChangeText={setQuery}
+        textAlign="left"
+        placeholder="모멘토를 검색하세요" // 추후 추천 키워드 도입 가능
+        placeholderTextColor={"rgba(240, 232, 227, 1)"}
+      />
     </XStack>
   );
 }
+
+const s = StyleSheet.create({
+  btnContainer: {
+    height: 40,
+    width: 40,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  icon: {
+    color: "rgba(255,255,255,0.85)",
+    fontSize: 26,
+    textShadowColor: " rgba(255, 246, 164, 0.68)",
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 26,
+  },
+  input: {
+    paddingLeft: 10,
+    backgroundColor: "rgba(255, 255, 255, 0.2)", // 유리
+    borderColor: "rgba(255,255,255,0.18)",
+    borderWidth: 1,
+    boxShadow: "0 8px 32px 0 rgba(134, 106, 156, 0.37)",
+  },
+});

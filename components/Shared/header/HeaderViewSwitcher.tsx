@@ -119,7 +119,7 @@ const s = StyleSheet.create({
     borderRadius: 999, // 상한..
     // 글래스모피즘 구현 위한 부분
     backgroundColor: "rgba(255, 255, 255, 0.2)", // 유리
-    boxShadow: "0 8px 32px 0 rgba(142, 151, 61, 0.37)",
+    boxShadow: "0 8px 32px 0 rgba(134, 106, 156, 0.37)",
     borderWidth: 1,
     borderColor: "rgba(255,255,255,0.18)",
 
