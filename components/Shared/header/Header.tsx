@@ -10,10 +10,16 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { XStack, YStack } from "tamagui";
 import { HeaderSearch } from "./HeaderSearch";
 import { HeaderTabs, HeaderTabsProps } from "./HeaderTabs";
+import { HeaderViewSwitcher } from "./HeaderViewSwitcher";
+export interface ViewSwitcherProps {
+  value: "list" | "grid";
+  onChange: (v: "list" | "grid") => void;
+}
 
 export interface CustomHeaderProps {
   headerSearchShown?: boolean;
   headerTabsProps?: HeaderTabsProps;
+  headerViewSwitcherProps?: ViewSwitcherProps;
 }
 
 export interface StackHeaderProps extends NativeStackHeaderProps {
@@ -50,10 +56,13 @@ export function Header({ options }: StackHeaderProps | TabsHeaderProps) {
             {/* @ts-ignore */}
             {render(options.headerTitle)}
           </YStack>
-          <YStack key="headerRight" f={1}>
+          <XStack f={1} jc="flex-end" ai="center" gap={10}>
+            {options.headerViewSwitcherProps && (
+              <HeaderViewSwitcher {...options.headerViewSwitcherProps} />
+            )}
             {/* @ts-ignore */}
             {render(options.headerRight)}
-          </YStack>
+          </XStack>
         </XStack>
       </YStack>
     );
@@ -66,7 +75,14 @@ export function Header({ options }: StackHeaderProps | TabsHeaderProps) {
         pb={10}
         marginTop={edgeInsets.top + 10}
       >
-        {options.headerSearchShown && <HeaderSearch />}
+        <XStack px={14} jc="flex-end" ai="center">
+          {options.headerSearchShown && <HeaderSearch />}
+          {/* 좌: 검색 아이콘 */}
+          {options.headerViewSwitcherProps && (
+            <HeaderViewSwitcher {...options.headerViewSwitcherProps} />
+          )}
+          {/* 우: List/Grid 스위칭 버튼 */}
+        </XStack>
         {options.headerTabsProps && <HeaderTabs {...options.headerTabsProps} />}
       </YStack>
     </YStack>

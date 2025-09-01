@@ -31,23 +31,16 @@ export default function Home() {
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      // headerSearchShown: true,
-      headerTabsProps: {
-        tabs: [
-          {
-            title: "List",
-            active: viewMode === "list",
-            onPress: () => setViewMode("list"),
-          },
-          {
-            title: "Grid",
-            active: viewMode === "grid",
-            onPress: () => setViewMode("grid"),
-          },
-        ],
-        align: "right",
-        variant: "pill",
+      headerSearchShown: true,
+      headerViewSwitcherProps: {
+        value: viewMode,
+        onChange: (v: ViewMode) => setViewMode(v),
       },
+      // 하드코딩..? 기존의 것이 지웡지지 않아 일단 작성해둠
+      headerTabsProps: undefined,
+      headerRight: undefined,
+      headerTitle: undefined,
+      headerLeft: undefined,
     } as any);
   }, [navigation, viewMode]);
 

@@ -32,7 +32,17 @@ export function HeaderSearch() {
     [query],
     500
   );
-
+  if (!isSearchScreen) {
+    // 기본 탭에서는 아이콘만 보일 수 있도록 분기
+    return (
+      <XStack px={14} jc="flex-end" ai="center">
+        <Pressable onPress={onPressIn} hitSlop={8}>
+          <Icon name="search" color="#000" size={22} />
+        </Pressable>
+      </XStack>
+    );
+  }
+  // 검색 탭에서는 검색창 확대
   return (
     <XStack px={20} jc={"center"} ai={"center"} gap={10}>
       {isSearchScreen && (
@@ -69,7 +79,6 @@ export function HeaderSearch() {
           placeholder="Search"
           // pointerEvents={isSearchScreen ? "auto" : "none"}
         />
-        {/* <Icon name="scan" color={"black"} size={24} /> */}
       </XStack>
     </XStack>
   );
