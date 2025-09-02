@@ -39291,6 +39291,13 @@
           "val": "#f99101",
           "variable": ""
         },
+        "pointBtnColor": {
+          "isVar": true,
+          "key": "$pointBtnColor",
+          "name": "c-color-pointBtnColor",
+          "val": "#d35313",
+          "variable": ""
+        },
         "bgColor": {
           "isVar": true,
           "key": "$bgColor",
@@ -41751,6 +41758,13 @@
         "key": "$pointColor",
         "name": "c-color-pointColor",
         "val": "#f99101",
+        "variable": ""
+      },
+      "$color.pointBtnColor": {
+        "isVar": true,
+        "key": "$pointBtnColor",
+        "name": "c-color-pointBtnColor",
+        "val": "#d35313",
         "variable": ""
       },
       "$color.bgColor": {
