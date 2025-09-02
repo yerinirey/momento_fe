@@ -61,9 +61,7 @@ export default function TabLayout() {
           alignItems: "center",
           flexDirection: "row",
         },
-        tabBarBackground: () => (
-          <View style={{ flex: 1, backgroundColor: "#feeceb" }} />
-        ),
+        tabBarBackground: () => <View flex={1} backgroundColor="$bgColor" />,
       }}
     >
       {tabs.map((tab) => (

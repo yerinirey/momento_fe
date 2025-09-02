@@ -3,6 +3,7 @@ import { supabase } from "@/supabase";
 import { Product } from "@/types/product";
 import { router, useNavigation } from "expo-router";
 import { useCallback, useEffect, useLayoutEffect, useState } from "react";
+import { useWindowDimensions } from "react-native";
 import { ScrollView, Text, XStack, YStack } from "tamagui";
 
 type ViewMode = "list" | "grid";
@@ -11,6 +12,12 @@ export default function Home() {
   const navigation = useNavigation();
   const [products, setProducts] = useState<Product[]>([]);
   const [viewMode, setViewMode] = useState<ViewMode>("list");
+  const { width } = useWindowDimensions();
+
+  const H_PADDING = 14;
+  const GAP = 12;
+  const NUM_COLS = 2;
+  const gridWidth = (width - H_PADDING * 2 - GAP * (NUM_COLS - 1)) / NUM_COLS;
 
   const onProductPress = ({ id }: Product) => {
     router.push(`/product/${id}`);
@@ -46,20 +53,21 @@ export default function Home() {
 
   return (
     <ScrollView f={1} bg={"$bgColor"}>
-      <YStack w={"100%"} px={14} pt={20}>
+      <YStack w={"100%"} px={H_PADDING} pt={20}>
         {viewMode === "grid" ? (
-          <XStack gap={12} jc="flex-start" fw="wrap">
+          <XStack flexWrap="wrap" gap={GAP} jc={"center"}>
             {products.map((product) => (
-              <ProductCard
-                key={product.id}
-                product={product}
-                variant="grid"
-                onPress={() => onProductPress(product)}
-              />
+              <YStack key={product.id} w={gridWidth}>
+                <ProductCard
+                  product={product}
+                  variant="grid"
+                  onPress={() => onProductPress(product)}
+                />
+              </YStack>
             ))}
           </XStack>
         ) : (
-          <YStack gap={12}>
+          <YStack gap={GAP}>
             {products.map((product) => (
               <ProductCard
                 key={product.id}
@@ -70,15 +78,6 @@ export default function Home() {
             ))}
           </YStack>
         )}
-        {/* <XStack gap={12} jc={"flex-start"} fw={"wrap"}>
-          {products.map((product) => (
-            <ProductCard
-              key={product.id}
-              product={product}
-              onPress={() => onProductPress(product)}
-            />
-          ))}
-        </XStack> */}
       </YStack>
     </ScrollView>
   );

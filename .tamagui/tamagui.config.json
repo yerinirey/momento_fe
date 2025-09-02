@@ -39295,7 +39295,28 @@
           "isVar": true,
           "key": "$bgColor",
           "name": "c-color-bgColor",
-          "val": "#FEECEB",
+          "val": "#fafaf8",
+          "variable": ""
+        },
+        "blackColor": {
+          "isVar": true,
+          "key": "$blackColor",
+          "name": "c-color-blackColor",
+          "val": "#1d1d1d",
+          "variable": ""
+        },
+        "btnWhiteColor": {
+          "isVar": true,
+          "key": "$btnWhiteColor",
+          "name": "c-color-btnWhiteColor",
+          "val": "#fffeff",
+          "variable": ""
+        },
+        "btnBorderColor": {
+          "isVar": true,
+          "key": "$btnBorderColor",
+          "name": "c-color-btnBorderColor",
+          "val": "#e8e8e8",
           "variable": ""
         }
       },
@@ -41736,7 +41757,28 @@
         "isVar": true,
         "key": "$bgColor",
         "name": "c-color-bgColor",
-        "val": "#FEECEB",
+        "val": "#fafaf8",
+        "variable": ""
+      },
+      "$color.blackColor": {
+        "isVar": true,
+        "key": "$blackColor",
+        "name": "c-color-blackColor",
+        "val": "#1d1d1d",
+        "variable": ""
+      },
+      "$color.btnWhiteColor": {
+        "isVar": true,
+        "key": "$btnWhiteColor",
+        "name": "c-color-btnWhiteColor",
+        "val": "#fffeff",
+        "variable": ""
+      },
+      "$color.btnBorderColor": {
+        "isVar": true,
+        "key": "$btnBorderColor",
+        "name": "c-color-btnBorderColor",
+        "val": "#e8e8e8",
         "variable": ""
       },
       "$radius.0": {

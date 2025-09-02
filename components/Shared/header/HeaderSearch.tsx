@@ -61,7 +61,7 @@ export function HeaderSearch() {
         onChangeText={setQuery}
         textAlign="left"
         placeholder="모멘토를 검색하세요" // 추후 추천 키워드 도입 가능
-        placeholderTextColor={"#1d1d1d"}
+        placeholderTextColor={"$blackColor"}
       />
     </XStack>
   );

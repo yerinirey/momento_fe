@@ -116,8 +116,8 @@ export default function AuthIndex() {
           autoCapitalize="none"
           keyboardType="email-address"
           borderWidth={1}
-          borderColor={"#e8e8e8"}
-          backgroundColor={"#fffeff"}
+          borderColor={"$btnBorderColor"}
+          backgroundColor={"$btnWhiteColor"}
           borderRadius={12}
           paddingHorizontal={14}
           paddingVertical={12}
@@ -132,8 +132,8 @@ export default function AuthIndex() {
           placeholder="••••••••"
           secureTextEntry
           borderWidth={1}
-          borderColor={"#e8e8e8"}
-          backgroundColor={"#fffeff"}
+          borderColor={"$btnBorderColor"}
+          backgroundColor={"$btnWhiteColor"}
           borderRadius={12}
           paddingHorizontal={14}
           paddingVertical={12}
@@ -143,10 +143,10 @@ export default function AuthIndex() {
           disabled={!email || !password || signingIn}
           onPress={handleEmailPasswordSignIn}
           backgroundColor={
-            !email || !password || signingIn ? "#fffeff" : "#1d1d1d"
+            !email || !password || signingIn ? "$btnWhiteColor" : "$blackColor"
           }
           borderWidth={1}
-          borderColor={"#e8e8e8"}
+          borderColor={"$btnBorderColor"}
           borderRadius={12}
           alignItems="center"
           textAlign="center"
@@ -158,7 +158,11 @@ export default function AuthIndex() {
             <ActivityIndicator />
           ) : (
             <Text
-              color={!email || !password || signingIn ? "#1d1d1d" : "#fffeff"}
+              color={
+                !email || !password || signingIn
+                  ? "$blackColor"
+                  : "$btnWhiteColor"
+              }
               fontWeight="bold"
             >
               로그인
@@ -167,9 +171,9 @@ export default function AuthIndex() {
         </Button>
         <Button
           onPress={() => router.push("/signup")}
-          backgroundColor={"#fffeff"}
+          backgroundColor={"$btnWhiteColor"}
           borderWidth={1}
-          borderColor={"#e8e8e8"}
+          borderColor={"$btnBorderColor"}
           borderRadius={12}
           alignItems="center"
           textAlign="center"
@@ -190,8 +194,8 @@ export default function AuthIndex() {
         <Button
           onPress={signInWithGoogle}
           borderWidth={1}
-          backgroundColor={"#fffeff"}
-          borderColor={"#e8e8e8"}
+          backgroundColor={"$btnWhiteColor"}
+          borderColor={"$btnBorderColor"}
           borderRadius={12}
           alignItems="center"
           textAlign="center"
@@ -208,8 +212,8 @@ export default function AuthIndex() {
           <Button
             onPress={signInWithApple}
             borderWidth={1}
-            backgroundColor={"#fffeff"}
-            borderColor={"#e8e8e8"}
+            backgroundColor={"$btnWhiteColor"}
+            borderColor={"$btnBorderColor"}
             borderRadius={12}
             alignItems="center"
             textAlign="center"
@@ -225,7 +229,12 @@ export default function AuthIndex() {
       </View>
 
       <View mt={"auto"} mb={24}>
-        <Text fontSize={12} color="#1d1d1d" opacity={0.8} textAlign="center">
+        <Text
+          fontSize={12}
+          color="$blackColor"
+          opacity={0.8}
+          textAlign="center"
+        >
           계속하면 이용약관 및 개인정보처리방침에 동의하는 것으로 간주됩니다.
         </Text>
       </View>

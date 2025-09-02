@@ -249,7 +249,7 @@ export default function CameraScreenNoTF() {
                 takePhoto();
               }}
               iconName="camera-outline"
-              bgColor="#f99101 "
+              bgColor="$pointColor"
             />
             <CameraSceneButton
               onPress={() => router.back()}

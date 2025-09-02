@@ -1,6 +1,5 @@
 import { Product } from "@/types/product";
-import { Dimensions, Pressable } from "react-native";
-import { Image, XStack, YStack } from "tamagui";
+import { Image, XStack, YStack, Button } from "tamagui";
 
 interface Props {
   product: Product;
@@ -9,28 +8,19 @@ interface Props {
 }
 
 export function ProductCard({ product, onPress, variant = "grid" }: Props) {
-  const cardWidth = variant === "grid" ? "48%" : "100%";
+  const imageAspect = variant === "grid" ? 1 : 4 / 3;
   return (
-    <Pressable onPress={onPress}>
-      <YStack height={Dimensions.get("window").width * 0.8} gap={8}>
-        <XStack
-          bg={"$shadowColor"}
-          w={"100%"}
-          // h={"100%"}
-          {...(variant === "list"
-            ? { aspectRatio: 16 / 9 }
-            : { aspectRatio: 1 })}
-          br={10}
-          overflow="hidden"
-        >
+    <Button unstyled onPress={onPress} w="100%" p={0} br={10}>
+      <YStack w="100%">
+        <XStack w={"100%"} br={10} overflow="hidden">
           <Image
             src={product.imageUrl ?? ""}
+            aspectRatio={imageAspect}
             objectFit="cover"
             w={"100%"}
-            h={"100%"}
           />
         </XStack>
       </YStack>
-    </Pressable>
+    </Button>
   );
 }

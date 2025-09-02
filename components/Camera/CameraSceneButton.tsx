@@ -11,7 +11,7 @@ interface Props extends ComponentProps<typeof Button> {
 export function CameraSceneButton({
   onPress,
   iconName,
-  bgColor = "#ffffff",
+  bgColor = "$btnWhiteColor",
   ...props
 }: Props) {
   return (

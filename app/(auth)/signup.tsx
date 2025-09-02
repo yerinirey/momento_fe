@@ -44,8 +44,8 @@ export default function SignUpScreen() {
           autoCapitalize="none"
           keyboardType="email-address"
           borderWidth={1}
-          borderColor={"#e8e8e8"}
-          backgroundColor={"#fffeff"}
+          borderColor={"$btnBorderColor"}
+          backgroundColor={"$btnWhiteColor"}
           borderRadius={12}
           paddingHorizontal={14}
           paddingVertical={12}
@@ -58,8 +58,8 @@ export default function SignUpScreen() {
           placeholder="••••••••"
           secureTextEntry
           borderWidth={1}
-          borderColor={"#e8e8e8"}
-          backgroundColor={"#fffeff"}
+          borderColor={"$btnBorderColor"}
+          backgroundColor={"$btnWhiteColor"}
           borderRadius={12}
           paddingHorizontal={14}
           paddingVertical={12}
@@ -69,10 +69,10 @@ export default function SignUpScreen() {
         disabled={!email || !password || signingUp}
         onPress={handleSignUp}
         backgroundColor={
-          !email || !password || signingUp ? "#fffeff" : "#1d1d1d"
+          !email || !password || signingUp ? "$btnWhiteColor" : "$blackColor"
         }
         borderWidth={1}
-        borderColor={"#e8e8e8"}
+        borderColor={"$btnBorderColor"}
         borderRadius={12}
         alignItems="center"
         textAlign="center"
@@ -83,7 +83,11 @@ export default function SignUpScreen() {
           <ActivityIndicator />
         ) : (
           <Text
-            color={!email || !password || signingUp ? "#1d1d1d" : "#fffeff"}
+            color={
+              !email || !password || signingUp
+                ? "$blackColor"
+                : "$btnWhiteColor"
+            }
             fontWeight="bold"
           >
             회원가입

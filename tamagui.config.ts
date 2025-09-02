@@ -8,7 +8,11 @@ export const tamaguiConfig = createTamagui({
     color: {
       ...config.tokens.color,
       pointColor: "#f99101",
-      bgColor: "#FEECEB",
+      pointBtnColor: "#d35313",
+      bgColor: "#fafaf8",
+      blackColor: "#1d1d1d",
+      btnWhiteColor: "#fffeff",
+      btnBorderColor: "#e8e8e8",
     },
   },
 });

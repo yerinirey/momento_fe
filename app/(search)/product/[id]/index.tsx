@@ -63,7 +63,7 @@ export default function ProductScreen() {
             <Icon
               name={isLiked ? "heart" : "heart-outline"}
               size={24}
-              color={isLiked ? "#d35313" : "gray"}
+              color={isLiked ? "$pointBtnColor" : "gray"}
               onPress={handleLikeToggle}
             />
             <Text>{likeCount}</Text>

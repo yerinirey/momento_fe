@@ -104,7 +104,7 @@ export default function Profile() {
             generatingModels.map((model) => (
               <YStack
                 key={model.id}
-                bg={"#f0f0f0"}
+                bg={"$bgColor"}
                 borderRadius={10}
                 p={15}
                 ai={"center"}
