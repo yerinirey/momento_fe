@@ -1,16 +1,22 @@
-import ProductBookMark from "@/components/Screens/bookmark/ProductBookMark";
 import { ProductCard } from "@/components/Screens/home/ProductCard";
-import { HeaderTabsProps } from "@/components/Shared/header/HeaderTabs";
 import { useBookmark } from "@/context/BookmarkProvider";
 import { Product } from "@/types/product";
 import { router, useNavigation } from "expo-router";
 import { useEffect, useLayoutEffect, useState } from "react";
-import { Alert } from "react-native";
+import { Alert, useWindowDimensions } from "react-native";
 import { ScrollView, Text, XStack, YStack } from "tamagui";
 type ViewMode = "list" | "grid";
 export default function Cart() {
   const { bookmarkedItems } = useBookmark();
   const [viewMode, setViewMode] = useState<ViewMode>("list");
+
+  const { width } = useWindowDimensions();
+
+  const H_PADDING = 14;
+  const GAP = 12;
+  const NUM_COLS = 2;
+  const gridWidth = (width - H_PADDING * 2 - GAP * (NUM_COLS - 1)) / NUM_COLS;
+
   const navigation = useNavigation();
 
   const onProductPress = ({ id }: Product) => {
@@ -31,19 +37,20 @@ export default function Cart() {
     } as any);
   }, [navigation, viewMode]);
   return (
-    <ScrollView f={1} bg={"white"} contentContainerStyle={{ pb: 20 }}>
-      <YStack f={1} gap={20} px={14} pt={20}>
+    <ScrollView f={1} bg={"$bgColor"}>
+      <YStack f={1} gap={20} px={H_PADDING} pt={20}>
         {bookmarkedItems.length ? (
           <>
             {viewMode === "grid" ? (
-              <XStack gap={12} jc="flex-start" fw="wrap">
+              <XStack flexWrap="wrap" gap={12} jc="flex-start">
                 {bookmarkedItems.map((product) => (
-                  <ProductCard
-                    key={product.id}
-                    product={product}
-                    variant="grid"
-                    onPress={() => onProductPress(product)}
-                  />
+                  <YStack key={product.id} w={gridWidth}>
+                    <ProductCard
+                      product={product}
+                      variant="grid"
+                      onPress={() => onProductPress(product)}
+                    />
+                  </YStack>
                 ))}
               </XStack>
             ) : (

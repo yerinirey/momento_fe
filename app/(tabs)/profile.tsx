@@ -48,6 +48,7 @@ export default function Profile() {
           gap={20}
           width="90%"
           mt={14}
+          backgroundColor={"$btnWhiteColor"}
         >
           {/* 아이콘 | 이름,이메일,가입정보 */}
           <XStack jc={"flex-start"} ai={"center"} gap={20}>
@@ -94,7 +95,7 @@ export default function Profile() {
           </XStack>
         </YStack>
         {/* 내가 생성한 모델들 영역 */}
-        <YStack p={20} gap={20}>
+        <YStack p={20} gap={20} ai={"flex-start"} w={"100%"}>
           <Text fos={20} fow={"bold"}>
             내 모멘토
           </Text>
@@ -149,7 +150,6 @@ const s = StyleSheet.create({
   infoBox: {
     borderColor: "rgba(180, 180, 180, 0.32)",
     borderWidth: 1,
-    backgroundColor: "white",
     borderRadius: 12,
     padding: 16,
 
