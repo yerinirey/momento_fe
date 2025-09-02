@@ -39,25 +39,32 @@ export function Header({ options }: StackHeaderProps | TabsHeaderProps) {
     return slot;
   };
 
-  if (options.headerLeft || options.headerTitle || options.headerRight) {
+  if (options.headerLeft || options.headerRight) {
     return (
       // <YStack bg={"$pointColor"}>
       <YStack bg={"$bgColor"}>
         <XStack
           jc={"space-between"}
           py={10}
-          px={10}
+          px={14}
           gap={20}
           mt={edgeInsets.top + 10}
         >
-          <YStack key="headerLeft" f={1}>
+          {/* 로고 */}
+          <YStack
+            key="headerLeft"
+            // f={1}
+            fg={0}
+            fs={0}
+            jc={"center"}
+            ai={"center"}
+            width={100}
+            height={40}
+          >
             {render(options.headerLeft)}
           </YStack>
-          <YStack key="headerTitle" f={1}>
-            {/* @ts-ignore */}
-            {render(options.headerTitle)}
-          </YStack>
-          <XStack f={1} jc="flex-end" ai="center" gap={10}>
+          <XStack fg={0} fs={0} jc="center" ai="center">
+            {options.headerSearchShown && <HeaderSearch />}
             {options.headerViewSwitcherProps && (
               <HeaderViewSwitcher {...options.headerViewSwitcherProps} />
             )}
@@ -69,16 +76,15 @@ export function Header({ options }: StackHeaderProps | TabsHeaderProps) {
     );
   }
   return (
-    // <YStack bg={"$pointColor"}>
     <YStack bg={"$bgColor"}>
-      <YStack bg="$bgColor" gap={20} pb={10} marginTop={edgeInsets.top + 10}>
+      <YStack bg="$bgColor" gap={20} py={10} marginTop={edgeInsets.top + 10}>
         <XStack px={14} jc="flex-end" ai="center">
-          {options.headerSearchShown && <HeaderSearch />}
           {/* 좌: 검색 아이콘 */}
+          {options.headerSearchShown && <HeaderSearch />}
+          {/* 우: List/Grid 스위칭 버튼 */}
           {options.headerViewSwitcherProps && (
             <HeaderViewSwitcher {...options.headerViewSwitcherProps} />
           )}
-          {/* 우: List/Grid 스위칭 버튼 */}
         </XStack>
         {options.headerTabsProps && <HeaderTabs {...options.headerTabsProps} />}
       </YStack>

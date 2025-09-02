@@ -4,7 +4,7 @@ import { Product } from "@/types/product";
 import { router, useNavigation } from "expo-router";
 import { useCallback, useEffect, useLayoutEffect, useState } from "react";
 import { useWindowDimensions } from "react-native";
-import { ScrollView, Text, XStack, YStack } from "tamagui";
+import { Image, ScrollView, Text, XStack, YStack } from "tamagui";
 
 type ViewMode = "list" | "grid";
 
@@ -42,8 +42,13 @@ export default function Home() {
       // 하드코딩..? 기존의 것이 지웡지지 않아 일단 작성해둠
       headerTabsProps: undefined,
       headerRight: undefined,
-      headerTitle: undefined,
-      headerLeft: undefined,
+      headerLeft: () => (
+        <Image
+          source={require("@/assets/logo_text.png")}
+          w="100%"
+          objectFit="contain"
+        />
+      ),
     } as any);
   }, [navigation, viewMode]);
 
