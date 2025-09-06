@@ -4,7 +4,7 @@ import { Product } from "@/types/product";
 import { router, useNavigation } from "expo-router";
 import { useCallback, useEffect, useLayoutEffect, useState } from "react";
 import { useWindowDimensions } from "react-native";
-import { Image, ScrollView, Text, XStack, YStack } from "tamagui";
+import { Image, ScrollView, XStack, YStack } from "tamagui";
 
 type ViewMode = "list" | "grid";
 

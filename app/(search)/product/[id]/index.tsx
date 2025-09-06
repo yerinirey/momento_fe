@@ -1,4 +1,3 @@
-import { useBookmark } from "@/context/BookmarkProvider";
 import { supabase } from "@/supabase";
 import { Product } from "@/types/product";
 import { router, useLocalSearchParams } from "expo-router";

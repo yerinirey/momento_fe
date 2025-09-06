@@ -1,10 +1,9 @@
 import { ProductCard } from "@/components/Screens/home/ProductCard";
-import { useBookmark } from "@/context/BookmarkProvider";
 import { supabase } from "@/supabase";
 import { Product } from "@/types/product";
 import { router, useNavigation } from "expo-router";
 import { useEffect, useLayoutEffect, useState } from "react";
-import { Alert, useWindowDimensions } from "react-native";
+import { useWindowDimensions } from "react-native";
 import { ScrollView, Text, XStack, YStack } from "tamagui";
 type ViewMode = "list" | "grid";
 export default function Cart() {

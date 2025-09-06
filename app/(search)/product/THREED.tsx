@@ -1,6 +1,6 @@
 import { useLocalSearchParams } from "expo-router";
 import useControls from "r3f-native-orbitcontrols";
-import { Suspense, useCallback, useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
   ActivityIndicator,

@@ -1,7 +1,6 @@
-import { View, Image, ScrollView, Alert, Linking } from "react-native";
-import React, { useEffect, useState } from "react";
+import { Image, ScrollView, Alert } from "react-native";
+import { useEffect, useState } from "react";
 import * as ImagePicker from "expo-image-picker";
-import { Camera, CameraType } from "expo-camera";
 import { Stack, router, useLocalSearchParams } from "expo-router";
 import { YStack, XStack, Button, Text } from "tamagui";
 import { H2, Paragraph } from "tamagui";

@@ -1,20 +1,9 @@
 import { useAuth } from "@/context/AuthProvider";
 import { supabase } from "@/supabase";
-import Icon from "@expo/vector-icons/Ionicons";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
-import { useModelGeneration } from "@/context/ModelGenerationProvider";
-import { ActivityIndicator, Pressable, StyleSheet } from "react-native";
-import {
-  Avatar,
-  Button,
-  Image,
-  ScrollView,
-  Sheet,
-  Text,
-  XStack,
-  YStack,
-} from "tamagui";
+import { ActivityIndicator, StyleSheet } from "react-native";
+import { Avatar, ScrollView, Text, XStack, YStack } from "tamagui";
 import { Product } from "@/types/product";
 import { ProductCard } from "@/components/Screens/home/ProductCard";
 
@@ -34,7 +23,7 @@ export default function Profile() {
         day: "numeric",
       }) + " 가입"
     : "";
-  console.log(session);
+  // console.log(session);
   async function loadProfileData() {
     setLoading(true);
     try {

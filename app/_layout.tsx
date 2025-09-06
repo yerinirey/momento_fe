@@ -1,17 +1,15 @@
 import { AuthProvider, useAuth } from "@/context/AuthProvider";
-import { BookmarkProvider } from "@/context/BookmarkProvider";
 import { ModelGenerationProvider } from "@/context/ModelGenerationProvider";
 import tamaguiConfig from "@/tamagui.config";
-import { router, Slot, useRouter, useSegments } from "expo-router";
+import { Slot, useRouter, useSegments } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import "react-native-reanimated";
 import { PortalProvider } from "tamagui";
 import { TamaguiProvider, Theme } from "@tamagui/core";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SplashScreen } from "expo-router";
 import { useFonts } from "expo-font";
-import { supabase } from "@/supabase";
 import ProfileBootstrapper from "@/components/system/ProfileBootstrapper";
 
 SplashScreen.preventAutoHideAsync();
@@ -64,20 +62,18 @@ function RootLayoutNav() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <AuthProvider>
-        <BookmarkProvider>
-          <ModelGenerationProvider>
-            <TamaguiProvider config={tamaguiConfig}>
-              <PortalProvider>
-                <StatusBar style="auto" />
-                <Theme>
-                  <ProfileBootstrapper />
-                  <AuthGate />
-                  <Slot />
-                </Theme>
-              </PortalProvider>
-            </TamaguiProvider>
-          </ModelGenerationProvider>
-        </BookmarkProvider>
+        <ModelGenerationProvider>
+          <TamaguiProvider config={tamaguiConfig}>
+            <PortalProvider>
+              <StatusBar style="auto" />
+              <Theme>
+                <ProfileBootstrapper />
+                <AuthGate />
+                <Slot />
+              </Theme>
+            </PortalProvider>
+          </TamaguiProvider>
+        </ModelGenerationProvider>
       </AuthProvider>
     </GestureHandlerRootView>
   );

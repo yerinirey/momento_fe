@@ -1,7 +1,5 @@
 import { Product } from "@/types/product";
 import { Image, XStack, YStack, Button } from "tamagui";
-import MCIcon from "@expo/vector-icons/MaterialCommunityIcons";
-import { useBookmark } from "@/context/BookmarkProvider";
 import { FloatingButton } from "@/components/Shared/FloatingButton";
 import { useEffect, useState } from "react";
 import { supabase } from "@/supabase";
