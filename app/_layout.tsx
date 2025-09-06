@@ -12,44 +12,8 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SplashScreen } from "expo-router";
 import { useFonts } from "expo-font";
 import { supabase } from "@/supabase";
+import ProfileBootstrapper from "@/components/system/ProfileBootstrapper";
 
-function ProfileBootstrapper() {
-  // 앱 시작 시 한 번, 그리고 SIGNED_IN 때마다
-  const ranOnce = useRef(false);
-
-  async function ensureProfile() {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) return;
-
-    await supabase
-      .from("profiles")
-      .upsert({ id: user.id }, { onConflict: "id" });
-  }
-
-  useEffect(() => {
-    // 앱 시작 시 세션이 이미 있다면 한 번 실행
-    if (!ranOnce.current) {
-      ranOnce.current = true;
-      ensureProfile();
-    }
-
-    // 로그인 때마다 실행
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === "SIGNED_IN" && session?.user) {
-        await ensureProfile();
-      }
-    });
-    return () => subscription.unsubscribe();
-  }, []);
-
-  return null;
-}
-
-// Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
@@ -84,6 +48,7 @@ function AuthGate() {
   const router = useRouter();
   useEffect(() => {
     if (loading) return;
+
     const inAuthGroup = segments[0] === "(auth)"; // 최상위 그룹 확인
     /*비로그인 상태로 비정상적인 경로 접속 방지용 */
     if (!session && !inAuthGroup) {
