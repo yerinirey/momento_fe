@@ -24,8 +24,9 @@ export default function Profile() {
   const [loading, setLoading] = useState(true);
   const [myModels, setMyModels] = useState<Product[]>([]);
   const [totals, setTotals] = useState({ models: 0, likes: 0, bookmarks: 0 });
+  const [displayName, setDisplayName] = useState<string>("");
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
 
-  // const { generatingModels } = useModelGeneration();
   const createdAt = session?.user.created_at
     ? new Date(session.user.created_at).toLocaleDateString("ko-KR", {
         year: "numeric",
@@ -33,7 +34,7 @@ export default function Profile() {
         day: "numeric",
       }) + " 가입"
     : "";
-
+  console.log(session);
   async function loadProfileData() {
     setLoading(true);
     try {
@@ -45,6 +46,17 @@ export default function Profile() {
         setTotals({ models: 0, likes: 0, bookmarks: 0 });
         return;
       }
+      // 0) 내 정보 가져오기
+      const { data: profile, error: profileErr } = await supabase
+        .from("profiles")
+        .select("username, avatar_url")
+        .eq("id", user.id)
+        .maybeSingle();
+      if (profileErr) console.log("profile select error:", profileErr.message);
+
+      // 이름/아바타 상태 반영
+      setDisplayName(profile?.username ?? user.email?.split("@")[0] ?? "user");
+      setAvatarUrl(profile?.avatar_url ?? null);
 
       // 1) 내 모델들
       const { data: modelsData, error: modelsErr } = await supabase
@@ -92,10 +104,36 @@ export default function Profile() {
     loadProfileData();
   }, []);
 
-  const signOut = async () => {
-    await supabase.auth.signOut();
-    router.replace("/(auth)");
-  };
+  useEffect(() => {
+    let channel: ReturnType<typeof supabase.channel> | null = null;
+    (async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) return;
+      channel = supabase
+        .channel("my-profile")
+        .on(
+          "postgres_changes",
+          {
+            event: "*",
+            schema: "public",
+            table: "profiles",
+            filter: `id=eq.${user.id}`,
+          },
+          () => loadProfileData()
+        )
+        .subscribe();
+    })();
+    return () => {
+      if (channel) supabase.removeChannel(channel);
+    };
+  }, []);
+
+  // const signOut = async () => {
+  //   await supabase.auth.signOut();
+  //   router.replace("/(auth)");
+  // };
 
   return (
     <>
@@ -119,11 +157,15 @@ export default function Profile() {
           {/* 아이콘 | 이름,이메일,가입정보 */}
           <XStack jc={"flex-start"} ai={"center"} gap={20}>
             <Avatar circular size={60}>
-              <Avatar.Fallback bg={"gray"} />
+              {avatarUrl ? (
+                <Avatar.Image src={avatarUrl} />
+              ) : (
+                <Avatar.Fallback bg={"gray"} />
+              )}
             </Avatar>
             <YStack>
               <Text fos={22} fow={"bold"}>
-                UserName
+                {displayName || "User"}
               </Text>
               <Text fos={18}>{session?.user.email}</Text>
               <Text>{createdAt}</Text>

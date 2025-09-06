@@ -17,10 +17,43 @@ export function useEnsureProfile() {
         console.log("[profiles] getUser err:", getUserErr.message);
       if (!user) return;
 
-      // 필요하면 user.user_metadata에서 username 등 초기값도 넣기
-      const { error } = await supabase
+      const { data: existing, error: selErr } = await supabase
         .from("profiles")
-        .upsert({ id: user.id }, { onConflict: "id" });
+        .select("id, username")
+        .eq("id", user.id)
+        .maybeSingle();
+      if (selErr) console.log("[profiles] select err:", selErr?.message);
+      if (existing) {
+        console.log("[profiles] already exists, skip");
+        return;
+      }
+
+      // 기본 username 생성 (유니크 보장: base + user.id 앞 네글자로 임시 생성)
+      // Profile탭에서 직접 수정 가능하게 변경 (추후)
+      const raw =
+        (user.user_metadata as any)?.username ??
+        (user.user_metadata as any)?.user_name ??
+        user.email?.split("@")[0] ??
+        "user";
+
+      const base =
+        raw
+          .toLowerCase()
+          .replace(/[^a-z0-9_]/g, "")
+          .slice(0, 20) || "user";
+      const username = `${base}-${user.id.slice(0, 4)}`;
+
+      // 아바타 초기값
+      const avatar =
+        (user.user_metadata as any)?.avatar_url ??
+        (user.user_metadata as any)?.picture ??
+        null;
+
+      const { error } = await supabase.from("profiles").upsert(
+        { id: user.id, username, avatar_url: avatar },
+        { onConflict: "id" } // id 충돌 시 업데이트
+      );
+
       if (error) console.error("[profiles] upsert error:", error);
       else console.log("[profiles] upsert ok");
     } finally {
@@ -31,11 +64,11 @@ export function useEnsureProfile() {
   useEffect(() => {
     if (!ranOnce.current) {
       ranOnce.current = true;
-      // 앱 시작 시 세션이 이미 있으면 한 번 실행
+      // 앱 시작 시 세션이 이미 있으면 보장
       ensureProfile();
     }
 
-    // 로그인/토큰갱신/유저정보 변경 시 다시 보장
+    // 로그인/유저갱신/토큰갱신 때 보장
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
