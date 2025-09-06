@@ -1,8 +1,11 @@
+export type UUID = string;
+
 export interface Product {
-  id: number;
+  id: UUID;
+  user_id: UUID;
   name: string;
-  imageUrl?: string | null;
-  model3DUrl?: string | null;
+  description?: string | null;
+  model_url?: string | null;
+  thumbnail_url?: string | null;
   created_at: string;
-  descriptions: string;
 }

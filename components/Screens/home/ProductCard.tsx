@@ -24,7 +24,7 @@ export function ProductCard({ product, onPress, variant = "grid" }: Props) {
         {/* 모멘토 사진 */}
         <XStack w={"100%"} br={10} overflow="hidden">
           <Image
-            src={product.imageUrl ?? ""}
+            src={product.thumbnail_url ?? ""}
             aspectRatio={imageAspect}
             objectFit="cover"
             w={"100%"}

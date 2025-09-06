@@ -24,7 +24,7 @@ export default function Home() {
   };
   const getTrend = useCallback(async () => {
     try {
-      const { data = [] } = await supabase.from("products").select("*");
+      const { data = [] } = await supabase.from("models").select("*");
       setProducts(data as Product[]);
       // console.log("🛒 ~ getTrend ~ data:", JSON.stringify(data, null, 2));
     } catch (error) {

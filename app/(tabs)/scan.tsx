@@ -93,15 +93,20 @@ export default function ScanScreen() {
     const thumbnail = selectedImages[0];
     try {
       addGeneratingModel(thumbnail);
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) throw new Error("로그인이 필요합니다");
+
       const { data, error } = await supabase
-        .from("products")
+        .from("models")
         .insert([
           {
+            user_id: user.id,
             name: "New Momento",
-            imageUrl: thumbnail,
-            model3DUrl:
-              "https://qysttxnnfsarkobrxkuu.supabase.co/storage/v1/object/public/products/boka_mapped_no_VColor.glb",
-            descriptions: ".",
+            image_url: thumbnail,
+            model_url:
+              "https://qysttxnnfsarkobrxkuu.supabase.co/storage/v1/object/public/models/boka_mapped_no_VColor.glb",
           },
         ])
         .select()

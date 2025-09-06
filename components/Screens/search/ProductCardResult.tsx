@@ -16,7 +16,7 @@ export function ProductCardResult({ product, onPress }: Props) {
     <Pressable onPress={onPress}>
       <XStack h={200} bc={"$gray5Light"} br={6} bw={1}>
         <Image
-          src={product.imageUrl ?? ""}
+          src={product.thumbnail_url ?? ""}
           objectFit="contain"
           w={"35%"}
           h={"100%"}

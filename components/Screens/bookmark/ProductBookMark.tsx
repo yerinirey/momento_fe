@@ -9,7 +9,7 @@ export default function ProductBookMark({ product }: Props) {
     <YStack gap={10}>
       <XStack bg={"$gray2Light"} minHeight={200} minWidth={"90%"}>
         <Image
-          src={product.imageUrl ?? ""}
+          src={product.thumbnail_url ?? ""}
           objectFit="contain"
           w={"35%"}
           h={"100%"}

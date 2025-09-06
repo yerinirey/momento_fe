@@ -14,13 +14,17 @@ export default function SignUpScreen() {
     }
     try {
       setSigningUp(true);
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email: email.trim(),
         password,
       });
       if (error) throw error;
 
-      Alert.alert("회원가입 완료", "이제 모멘토를 둘러보세요.");
+      if (data.session) {
+        Alert.alert("회원가입 완료", "이제 모멘토를 둘러보세요.");
+      } else {
+        Alert.alert("메일 확인 필요", "이메일 인증 후 다시 로그인 해주세요."); // 검토 예정
+      }
     } catch (e: any) {
       Alert.alert("회원가입 실패", e.message ?? "잠시 후 다시 시도해주세요.");
     } finally {

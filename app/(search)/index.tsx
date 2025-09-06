@@ -17,7 +17,7 @@ export default function SearchScreen() {
 
     try {
       const { data = [] } = await supabase
-        .from("products")
+        .from("models")
         .select("*")
         .ilike("name", `%${query}%`);
       setProducts(data as Product[]);
