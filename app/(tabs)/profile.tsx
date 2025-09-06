@@ -2,9 +2,9 @@ import { useAuth } from "@/context/AuthProvider";
 import { supabase } from "@/supabase";
 import Icon from "@expo/vector-icons/Ionicons";
 import { router } from "expo-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useModelGeneration } from "@/context/ModelGenerationProvider";
-import { Pressable, StyleSheet } from "react-native";
+import { ActivityIndicator, Pressable, StyleSheet } from "react-native";
 import {
   Avatar,
   Button,
@@ -15,10 +15,17 @@ import {
   XStack,
   YStack,
 } from "tamagui";
+import { Product } from "@/types/product";
+import { ProductCard } from "@/components/Screens/home/ProductCard";
 
 export default function Profile() {
   const { session } = useAuth();
-  const { generatingModels } = useModelGeneration();
+
+  const [loading, setLoading] = useState(true);
+  const [myModels, setMyModels] = useState<Product[]>([]);
+  const [totals, setTotals] = useState({ models: 0, likes: 0, bookmarks: 0 });
+
+  // const { generatingModels } = useModelGeneration();
   const createdAt = session?.user.created_at
     ? new Date(session.user.created_at).toLocaleDateString("ko-KR", {
         year: "numeric",
@@ -26,6 +33,65 @@ export default function Profile() {
         day: "numeric",
       }) + " 가입"
     : "";
+
+  async function loadProfileData() {
+    setLoading(true);
+    try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) {
+        setMyModels([]);
+        setTotals({ models: 0, likes: 0, bookmarks: 0 });
+        return;
+      }
+
+      // 1) 내 모델들
+      const { data: modelsData, error: modelsErr } = await supabase
+        .from("models")
+        .select("id, name, description, model_url, thumbnail_url, created_at")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false });
+      if (modelsErr) throw modelsErr;
+
+      const items = (modelsData ?? []) as Product[];
+      setMyModels(items);
+
+      // 2) 총 좋아요/북마크 (내 모델 id 집합으로 in() 집계)
+      const ids = items.map((m) => m.id);
+      let likes = 0,
+        bms = 0;
+
+      if (ids.length) {
+        const [
+          { count: likeCnt, error: likeErr },
+          { count: bmCnt, error: bmErr },
+        ] = await Promise.all([
+          supabase
+            .from("likes")
+            .select("*", { count: "exact", head: true })
+            .in("model_id", ids),
+          supabase
+            .from("bookmarks")
+            .select("*", { count: "exact", head: true })
+            .in("model_id", ids),
+        ]);
+        if (likeErr) throw likeErr;
+        if (bmErr) throw bmErr;
+        likes = likeCnt ?? 0;
+        bms = bmCnt ?? 0;
+      }
+
+      setTotals({ models: items.length, likes, bookmarks: bms });
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    loadProfileData();
+  }, []);
+
   const signOut = async () => {
     await supabase.auth.signOut();
     router.replace("/(auth)");
@@ -76,19 +142,19 @@ export default function Profile() {
           <XStack jc={"space-around"}>
             <YStack jc={"center"} ai={"center"}>
               <Text color={"blue"} fontWeight={"bold"} fontSize={24}>
-                0
+                {totals.models}
               </Text>
               <Text>Models</Text>
             </YStack>
             <YStack jc={"center"} ai={"center"}>
               <Text color={"red"} fontWeight={"bold"} fontSize={24}>
-                0
+                {totals.likes}
               </Text>
               <Text>Likes</Text>
             </YStack>
             <YStack jc={"center"} ai={"center"}>
               <Text color={"purple"} fontWeight={"bold"} fontSize={24}>
-                0
+                {totals.bookmarks}
               </Text>
               <Text>Bookmarks</Text>
             </YStack>
@@ -99,7 +165,24 @@ export default function Profile() {
           <Text fos={20} fow={"bold"}>
             내 모멘토
           </Text>
-          {generatingModels.length === 0 ? (
+
+          {loading ? (
+            <ActivityIndicator />
+          ) : myModels.length === 0 ? (
+            <Text color="$gray10">생성한 모멘토가 없습니다.</Text>
+          ) : (
+            <YStack gap={12} w="100%">
+              {myModels.map((model) => (
+                <ProductCard
+                  key={model.id}
+                  product={model}
+                  variant="list"
+                  onPress={() => router.push(`/product/${model.id}`)}
+                />
+              ))}
+            </YStack>
+          )}
+          {/* {generatingModels.length === 0 ? (
             <Text color="$gray10">생성한 모멘토가 없습니다.</Text>
           ) : (
             generatingModels.map((model) => (
@@ -125,7 +208,7 @@ export default function Profile() {
                 </Text>
               </YStack>
             ))
-          )}
+          )} */}
         </YStack>
       </ScrollView>
       {/* <Sheet
