@@ -3,7 +3,7 @@ import { supabase } from "@/supabase";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, StyleSheet } from "react-native";
-import { Avatar, ScrollView, Text, XStack, YStack } from "tamagui";
+import { Avatar, Button, ScrollView, Text, XStack, YStack } from "tamagui";
 import { Product } from "@/types/product";
 import { ProductCard } from "@/components/Screens/home/ProductCard";
 
@@ -242,20 +242,6 @@ export default function Profile() {
           )} */}
         </YStack>
       </ScrollView>
-      {/* <Sheet
-        modal
-        open={sheetOpen}
-        onOpenChange={(open: boolean) => setSheetOpen(open)}
-      >
-        <Sheet.Overlay />
-        <Sheet.Handle />
-        <Sheet.Frame p={20} gap={20} minHeight={120}>
-          <Text>{session?.user.email}</Text>
-          <Button textProps={{ fos: 18 }} bg={"#d35313"} onPress={signOut}>
-            로그아웃
-          </Button>
-        </Sheet.Frame>
-      </Sheet> */}
     </>
   );
 }

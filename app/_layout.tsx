@@ -48,13 +48,14 @@ function AuthGate() {
     if (loading) return;
 
     const inAuthGroup = segments[0] === "(auth)"; // 최상위 그룹 확인
+    const isSignupFlow = inAuthGroup && segments[1] === "signup";
     /*비로그인 상태로 비정상적인 경로 접속 방지용 */
     if (!session && !inAuthGroup) {
       router.replace("/(auth)");
-    } else if (session && inAuthGroup) {
+    } else if (session && inAuthGroup && !isSignupFlow) {
       router.replace("/(tabs)");
     }
-  }, [session, loading, segments]);
+  }, [session, loading, segments, router]);
   return null;
 }
 
