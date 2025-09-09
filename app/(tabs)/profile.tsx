@@ -2,10 +2,20 @@ import { useAuth } from "@/context/AuthProvider";
 import { supabase } from "@/supabase";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
-import { ActivityIndicator, StyleSheet } from "react-native";
+import { ActivityIndicator, StyleSheet, Pressable } from "react-native";
 import { Avatar, Button, ScrollView, Text, XStack, YStack } from "tamagui";
 import { Product } from "@/types/product";
 import { ProductCard } from "@/components/Screens/home/ProductCard";
+import MCIcon from "@expo/vector-icons/MaterialIcons";
+
+export type UUID = string;
+
+export interface Profile {
+  id: UUID;
+  username: string;
+  avatar_url: string;
+  created_at: string;
+}
 
 export default function Profile() {
   const { session } = useAuth();
@@ -120,23 +130,26 @@ export default function Profile() {
   }, []);
 
   // const signOut = async () => {
-  //   await supabase.auth.signOut();
-  //   router.replace("/(auth)");
+  //   await supabase.auth.signOut();
+  //   router.replace("/(auth)");
   // };
+
+  const handleEditProfile = () => {
+    router.push("/edit-profile");
+  };
 
   return (
     <>
       <ScrollView
         bg={"$bgColor"}
         contentContainerStyle={{
-          alignItems: "center", // x축 중앙 정렬 (flex레이아웃이 아니라고 함)
+          alignItems: "center",
         }}
       >
         {/* 내 정보 */}
         <YStack
           style={s.infoBox}
           jc={"flex-start"}
-          // ai={"center"}
           p={20}
           gap={20}
           width="90%"
@@ -144,21 +157,26 @@ export default function Profile() {
           backgroundColor={"$btnWhiteColor"}
         >
           {/* 아이콘 | 이름,이메일,가입정보 */}
-          <XStack jc={"flex-start"} ai={"center"} gap={20}>
-            <Avatar circular size={60}>
-              {avatarUrl ? (
-                <Avatar.Image src={avatarUrl} />
-              ) : (
-                <Avatar.Fallback bg={"gray"} />
-              )}
-            </Avatar>
-            <YStack>
-              <Text fos={22} fow={"bold"}>
-                {displayName || "User"}
-              </Text>
-              <Text fos={18}>{session?.user.email}</Text>
-              <Text>{createdAt}</Text>
-            </YStack>
+          <XStack jc={"space-between"} ai={"flex-start"} width="100%">
+            <XStack jc={"flex-start"} ai={"center"} gap={20}>
+              <Avatar circular size={60}>
+                {avatarUrl ? (
+                  <Avatar.Image src={avatarUrl} />
+                ) : (
+                  <Avatar.Fallback bg={"gray"} />
+                )}
+              </Avatar>
+              <YStack>
+                <Text fos={22} fow={"bold"}>
+                  {displayName || "User"}
+                </Text>
+                <Text fos={18}>{session?.user.email}</Text>
+                <Text>{createdAt}</Text>
+              </YStack>
+            </XStack>
+            <Pressable onPress={handleEditProfile} style={{ padding: 5 }}>
+              <MCIcon name={"settings"} size={24} color={"$gray10"} />
+            </Pressable>
           </XStack>
           {/* 중앙선 */}
           <XStack
@@ -213,33 +231,6 @@ export default function Profile() {
               ))}
             </YStack>
           )}
-          {/* {generatingModels.length === 0 ? (
-            <Text color="$gray10">생성한 모멘토가 없습니다.</Text>
-          ) : (
-            generatingModels.map((model) => (
-              <YStack
-                key={model.id}
-                bg={"$bgColor"}
-                borderRadius={10}
-                p={15}
-                ai={"center"}
-                gap={10}
-              >
-                <Image
-                  source={{ uri: model.thumbnailUri }}
-                  width={100}
-                  height={100}
-                  borderRadius={5}
-                />
-                <Text fos={16} fow={"bold"}>
-                  모멘토 생성중
-                </Text>
-                <Text fos={14} color={"gray"}>
-                  생성이 완료되면 알려드릴게요.
-                </Text>
-              </YStack>
-            ))
-          )} */}
         </YStack>
       </ScrollView>
     </>
@@ -253,14 +244,11 @@ const s = StyleSheet.create({
     borderRadius: 12,
     padding: 16,
 
-    // boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
-    // boxShadow는 RN네이티브에서 사용 불가능, 대체
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
     shadowRadius: 12,
     shadowOpacity: 0.08,
 
-    // android Shadow
     elevation: 4,
   },
 });

@@ -103,7 +103,7 @@ export default function ScanScreen() {
           {
             user_id: user.id,
             name: "New Momento",
-            image_url: thumbnail,
+            thumbnail_url: thumbnail,
             model_url:
               "https://qysttxnnfsarkobrxkuu.supabase.co/storage/v1/object/public/models/boka_mapped_no_VColor.glb",
           },
@@ -144,7 +144,7 @@ export default function ScanScreen() {
   };
 
   return (
-    <YStack bg={"white"} flex={1} p="8%" gap={20} px={16} pt={20}>
+    <YStack bg={"$bgColor"} flex={1} p="8%" gap={20} px={16} pt={20}>
       <Stack.Screen options={{ title: "Scan" }} />
       <Text fos={20} fow={"bold"}>
         3D 모델 생성
