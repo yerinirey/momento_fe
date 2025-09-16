@@ -171,7 +171,7 @@ export default function CameraScreenNoTF() {
       if (stableMs >= STABLE_WINDOW_MS) {
         // 조건 충족 → 카운트다운 시작
         stopMonitor();
-        beginCountdownAndShoot();
+        // beginCountdownAndShoot();
       }
     } else {
       // 조건 깨지면 타이머 리셋
@@ -179,22 +179,22 @@ export default function CameraScreenNoTF() {
     }
   };
 
-  const beginCountdownAndShoot = () => {
-    if (countdownTimerRef.current) clearInterval(countdownTimerRef.current);
-    let c = 3;
-    setCountdown(c);
-    countdownTimerRef.current = setInterval(() => {
-      c -= 1;
-      if (c <= 0) {
-        clearInterval(countdownTimerRef.current as NodeJS.Timeout);
-        countdownTimerRef.current = null;
-        setCountdown(null);
-        takePhoto();
-      } else {
-        setCountdown(c);
-      }
-    }, 1000);
-  };
+  // const beginCountdownAndShoot = () => {
+  //   if (countdownTimerRef.current) clearInterval(countdownTimerRef.current);
+  //   let c = 3;
+  //   setCountdown(c);
+  //   countdownTimerRef.current = setInterval(() => {
+  //     c -= 1;
+  //     if (c <= 0) {
+  //       clearInterval(countdownTimerRef.current as NodeJS.Timeout);
+  //       countdownTimerRef.current = null;
+  //       setCountdown(null);
+  //       takePhoto();
+  //     } else {
+  //       setCountdown(c);
+  //     }
+  //   }, 1000);
+  // };
 
   useEffect(() => {
     checkPermissions();

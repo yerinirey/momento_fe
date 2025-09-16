@@ -2,40 +2,10 @@ import { Image, ScrollView, Alert } from "react-native";
 import { useEffect, useState } from "react";
 import * as ImagePicker from "expo-image-picker";
 import { Stack, router, useLocalSearchParams } from "expo-router";
-import { YStack, XStack, Button, Text } from "tamagui";
-import { H2, Paragraph } from "tamagui";
+import { YStack, XStack, Button, Text, Paragraph } from "tamagui";
 import { useModelGeneration } from "../../context/ModelGenerationProvider";
 import { DefaultButton } from "@/components/Shared/DefaultButton";
-
-/* Notification */
-import * as Notifications from "expo-notifications";
-import { Platform } from "react-native";
 import { supabase } from "@/supabase";
-
-// (앱 어디선가 1회) 알림 핸들러(배너 표시용)
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldSetBadge: false,
-    shouldPlaySound: false,
-  }),
-});
-async function ensureNotificationReady() {
-  const { status: existing } = await Notifications.getPermissionsAsync();
-  if (existing !== "granted") {
-    const { status } = await Notifications.requestPermissionsAsync();
-    if (status !== "granted") {
-      throw new Error("알림 권한이 필요합니다.");
-    }
-  }
-  if (Platform.OS === "android") {
-    await Notifications.setNotificationChannelAsync("default", {
-      name: "default",
-      importance: Notifications.AndroidImportance.DEFAULT,
-    });
-  }
-}
-/* Notification End */
 
 export default function ScanScreen() {
   const [selectedImages, setSelectedImages] = useState<string[]>([]);
@@ -61,7 +31,6 @@ export default function ScanScreen() {
       }
     }
     router.setParams({ capturedUris: undefined });
-    ensureNotificationReady().catch((e) => console.warn(e.message));
   }, [capturedUrisParam]);
 
   /* 갤러리에서 이미지 선택 */
@@ -114,22 +83,6 @@ export default function ScanScreen() {
       if (error) {
         console.error("Insert Error: ", error);
         Alert.alert("모델 생성 처리 중 문제가 발생했어요.");
-      } else {
-        await Notifications.cancelAllScheduledNotificationsAsync();
-        const fireAt = new Date(Date.now() + 10_000); // 10초 뒤
-        const id = await Notifications.scheduleNotificationAsync({
-          content: {
-            title: "모델이 생성되었어요 🎉",
-            body: "지금 확인해보세요.",
-            data: {
-              productId: data.id,
-            },
-          },
-          trigger: {
-            type: Notifications.SchedulableTriggerInputTypes.DATE,
-            date: fireAt,
-          },
-        });
       }
 
       setSelectedImages([]);
@@ -150,7 +103,7 @@ export default function ScanScreen() {
         3D 모델 생성
       </Text>
 
-      <XStack jc={"space-between"} mb={"10"}>
+      <XStack jc={"space-between"} mb={10}>
         <DefaultButton textProps={{ fos: 14 }} onPress={pickImage}>
           갤러리에서 사진 선택
         </DefaultButton>
@@ -165,10 +118,10 @@ export default function ScanScreen() {
       {selectedImages.length > 0 && (
         <YStack
           width="100%"
-          mb="10"
+          mb={10}
           borderWidth={1}
           borderColor="$gray8"
-          p={"10"}
+          p={10}
           br={10}
         >
           <Paragraph>선택된 이미지 ({selectedImages.length}장) </Paragraph>

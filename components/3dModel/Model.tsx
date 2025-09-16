@@ -1,15 +1,10 @@
 import * as THREE from "three";
-import React, { useEffect, useRef, useState } from "react";
+import React, { JSX, useEffect, useRef, useState } from "react";
 import { useGLTF } from "@react-three/drei/native";
-import { GLTF } from "three-stdlib";
-import { GroupProps } from "@react-three/fiber";
-import { Text } from "tamagui";
-type GLTFResult = GLTF & {
-  nodes: Record<string, THREE.Mesh>;
-  materials: Record<string, THREE.MeshStandardMaterial>;
-};
 
-interface ModelProps extends GroupProps {
+type PrimitiveProps = JSX.IntrinsicElements["primitive"];
+
+interface ModelProps extends Omit<PrimitiveProps, "object"> {
   modelUrl: string;
   onLoaded?: () => void;
 }

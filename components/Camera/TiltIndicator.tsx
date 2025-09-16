@@ -40,7 +40,8 @@ export default function TiltIndicator({ mode = "full" }: TiltProps) {
   const [showToast, setShowToast] = useState(false);
   const toastOpacity = useRef(new Animated.Value(0)).current;
   const lastToastAtRef = useRef<number>(0);
-  const toastTimerRef = useRef<NodeJS.Timeout | null>(null);
+  type TimeoutHandle = ReturnType<typeof setTimeout>;
+  const toastTimerRef = useRef<TimeoutHandle | null>(null);
   const toastDurationMs = 1200;
   const toastCooldownMs = 2500;
 
@@ -95,7 +96,10 @@ export default function TiltIndicator({ mode = "full" }: TiltProps) {
     DeviceMotion.setUpdateInterval(120);
     return () => {
       sub.remove();
-      if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+      if (toastTimerRef.current) {
+        clearTimeout(toastTimerRef.current);
+        toastTimerRef.current = null;
+      }
     };
   }, []);
 
@@ -107,7 +111,10 @@ export default function TiltIndicator({ mode = "full" }: TiltProps) {
       duration: 180,
       useNativeDriver: true,
     }).start();
-    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+    if (toastTimerRef.current) {
+      clearTimeout(toastTimerRef.current);
+      toastTimerRef.current = null;
+    }
     toastTimerRef.current = setTimeout(() => {
       Animated.timing(toastOpacity, {
         toValue: 0,

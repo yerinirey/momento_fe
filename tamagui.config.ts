@@ -1,12 +1,27 @@
-import { config } from "@tamagui/config/v3";
-import { createTamagui } from "tamagui";
+import { createTamagui, type CreateTamaguiProps } from "tamagui";
+import { defaultConfig } from "@tamagui/config/v4";
+import { shorthands } from "@tamagui/shorthands";
+
+// const appConfig = {
+//   ...defaultConfig,
+//   shorthands,
+//   themes: {
+//     ...defaultConfig.themes,
+//       pointColor: "#f99101",
+//       pointBtnColor: "#d35313",
+//       bgColor: "#fafaf8",
+//       blackColor: "#1d1d1d",
+//       btnWhiteColor: "#fffeff",
+//       btnBorderColor: "#e8e8e8",
+//     },
+//   };
 
 export const tamaguiConfig = createTamagui({
-  ...config,
+  ...defaultConfig,
+  shorthands,
   tokens: {
-    ...config.tokens,
+    ...defaultConfig.tokens,
     color: {
-      ...config.tokens.color,
       pointColor: "#f99101",
       pointBtnColor: "#d35313",
       bgColor: "#fafaf8",
@@ -15,12 +30,14 @@ export const tamaguiConfig = createTamagui({
       btnBorderColor: "#e8e8e8",
     },
   },
+  settings: {
+    onlyAllowShorthands: false,
+  },
 });
-
-export default tamaguiConfig;
-
-export type Conf = typeof tamaguiConfig;
+export type AppTamaguiConfig = typeof tamaguiConfig;
 
 declare module "tamagui" {
-  interface TamaguiCustomConfig extends Conf {}
+  interface TamaguiCustomConfig extends AppTamaguiConfig {}
 }
+
+export default tamaguiConfig;
