@@ -10,8 +10,11 @@ export default function SearchScreen() {
   const { query } = useLocalSearchParams();
   const [products, setProducts] = useState<Product[]>([]);
 
-  // console.log("~ SearchScreen ~ query:", query);
-  // console.log("~ SearchScreen ~ products:", products);
+  // Debug: inspect search params/results
+  if (__DEV__) {
+    // console.log("~ SearchScreen ~ query:", query);
+    // console.log("~ SearchScreen ~ products:", products);
+  }
   const getProducts = useCallback(async () => {
     if (!query) return setProducts([]);
 
@@ -22,7 +25,7 @@ export default function SearchScreen() {
         .ilike("name", `%${query}%`);
       setProducts(data as Product[]);
     } catch (error) {
-      console.log("error", error);
+      console.error("search getProducts error", error);
     }
   }, [query]);
 

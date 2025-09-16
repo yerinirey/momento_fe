@@ -94,7 +94,7 @@ export function ProductCard({ product, onPress, variant = "grid" }: Props) {
     } catch (err) {
       // 실패 시 롤백
       setLiked(prev);
-      console.log("LIKE TOGGLE ERROR:", err);
+      console.error("LIKE TOGGLE ERROR:", err);
     } finally {
       setBusyLike(false);
     }
@@ -133,7 +133,7 @@ export function ProductCard({ product, onPress, variant = "grid" }: Props) {
       }
     } catch (err) {
       setBookmarked(prev);
-      console.log("BOOKMARK TOGGLE ERROR:", err);
+      console.error("BOOKMARK TOGGLE ERROR:", err);
     } finally {
       setBusyBm(false);
     }
@@ -166,9 +166,7 @@ export function ProductCard({ product, onPress, variant = "grid" }: Props) {
             active={liked}
             disabled={busyLike}
             icon={liked ? "heart" : "heart-outline"}
-            onPress={(e?: any) => {
-              onToggleLike;
-            }}
+            onPress={(e?: any) => onToggleLike(e)}
           />
 
           {/* Bookmarks */}
@@ -177,9 +175,7 @@ export function ProductCard({ product, onPress, variant = "grid" }: Props) {
             active={bookmarked}
             icon={bookmarked ? "bookmark" : "bookmark-outline"}
             disabled={busyBm}
-            onPress={(e?: any) => {
-              onToggleBookmark;
-            }}
+            onPress={(e?: any) => onToggleBookmark(e)}
           />
         </XStack>
       </YStack>

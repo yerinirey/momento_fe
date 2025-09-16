@@ -9,19 +9,21 @@ export function useDumpGLTF(uri: string, name?: string) {
     const pure = gltf?.parser?.json;
     if (!pure) return;
 
-    console.log("Asset Info:", pure.asset);
-    console.log(
-      "Meshes:",
-      pure.meshes?.length,
-      "Materials:",
-      pure.materials?.length
-    );
+    if (__DEV__) {
+      console.log("Asset Info:", pure.asset);
+      console.log(
+        "Meshes:",
+        pure.meshes?.length,
+        "Materials:",
+        pure.materials?.length
+      );
+    }
 
     if (name) {
       const path = FileSystem.cacheDirectory + `${name}.json`;
       FileSystem.writeAsStringAsync(path, JSON.stringify(pure, null, 2)).then(
         () => {
-          console.log("GLTF JSON saved to", path);
+          if (__DEV__) console.log("GLTF JSON saved to", path);
         }
       );
     }

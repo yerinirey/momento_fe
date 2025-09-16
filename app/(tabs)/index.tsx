@@ -26,9 +26,12 @@ export default function Home() {
     try {
       const { data = [] } = await supabase.from("models").select("*");
       setProducts(data as Product[]);
-      // console.log("🛒 ~ getTrend ~ data:", JSON.stringify(data, null, 2));
+      // Debug: inspect data shape
+      if (__DEV__) {
+        // console.log("🛒 ~ getTrend ~ data:", JSON.stringify(data, null, 2));
+      }
     } catch (error) {
-      console.log("error", error);
+      console.error("getTrend error", error);
     }
   }, []);
 

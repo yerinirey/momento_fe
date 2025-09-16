@@ -62,7 +62,7 @@ export function FloatingButton({
       jc="center"
       bg="rgba(255,255,255,0.16)"
       bw={1}
-      bc="rgba(255,255,255,0.35)"
+      borderColor="rgba(255,255,255,0.35)"
     >
       <Icon name={icon as any} size={14} color="white" />
     </YStack>

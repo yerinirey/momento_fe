@@ -31,10 +31,15 @@ export interface TabsHeaderProps extends BottomTabHeaderProps {
 
 export function Header({ options }: StackHeaderProps | TabsHeaderProps) {
   const edgeInsets = useSafeAreaInsets();
-  const render = (slot?: any) => {
+  const render = (
+    slot?:
+      | React.ReactNode
+      | ((args?: Record<string, unknown>) => React.ReactNode)
+  ) => {
     if (!slot) return null;
     // 함수라면 실행해서 ReactNode 반환
-    if (typeof slot === "function") return slot({});
+    if (typeof slot === "function")
+      return (slot as (args?: Record<string, unknown>) => React.ReactNode)({});
     // 이미 ReactNode라면 그대로 렌더
     return slot;
   };
@@ -68,7 +73,6 @@ export function Header({ options }: StackHeaderProps | TabsHeaderProps) {
             {options.headerViewSwitcherProps && (
               <HeaderViewSwitcher {...options.headerViewSwitcherProps} />
             )}
-            {/* @ts-ignore */}
             {render(options.headerRight)}
           </XStack>
         </XStack>

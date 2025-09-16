@@ -8,6 +8,7 @@ import {
   StyleSheet,
   Animated,
 } from "react-native";
+import { Dimensions } from "react-native";
 import Slider from "@react-native-community/slider";
 import {
   ViroARScene,
@@ -16,6 +17,8 @@ import {
   ViroAmbientLight,
   ViroClickStateTypes,
 } from "@reactvision/react-viro";
+import { ViroQuad } from "@reactvision/react-viro";
+import { ViroMaterials } from "@reactvision/react-viro";
 import { useLocalSearchParams } from "expo-router";
 import { Viro3DPoint } from "@reactvision/react-viro/dist/components/Types/ViroUtils";
 
@@ -36,13 +39,15 @@ function forwardFromRotationDeg(rot: number[]): Viro3DPoint {
 type SceneBridgeProps = {
   modelUrl: string;
   placedPosition: Viro3DPoint | null;
-  onRequestPlaceAt: (p: Viro3DPoint) => void;
+  onRequestPlaceAt: (p: Viro3DPoint, opts?: { silent?: boolean }) => void;
   onModelLoadStart: () => void;
   onModelLoadEnd: () => void;
   scale: number;
+  onPinchStart?: () => void;
 };
 
 const Scene: React.FC<any> = (props) => {
+  const PINCH_SENSITIVITY = 0.25; // 0.0~1.0 (작을수록 덜 민감)
   const {
     modelUrl,
     placedPosition,
@@ -56,6 +61,24 @@ const Scene: React.FC<any> = (props) => {
     position: [0, 0, 0],
     forward: [0, 0, -1],
   });
+
+  // Ref to ViroARScene to perform hit-tests
+  const sceneRef = useRef<any>(null);
+
+  // Reticle state based on plane hit-test at screen center
+  const [reticlePos, setReticlePos] = useState<Viro3DPoint | null>(null);
+  const [reticleVisible, setReticleVisible] = useState(false);
+
+  // Suppress click while dragging to avoid accidental placements/toasts
+  const draggingRef = useRef(false);
+  const dragResetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const markDragging = () => {
+    draggingRef.current = true;
+    if (dragResetTimer.current) clearTimeout(dragResetTimer.current);
+    dragResetTimer.current = setTimeout(() => {
+      draggingRef.current = false;
+    }, 150);
+  };
 
   const onCameraTransformUpdate = (e: {
     position?: Viro3DPoint;
@@ -78,6 +101,38 @@ const Scene: React.FC<any> = (props) => {
     } else if (Array.isArray(e.rotation) && e.rotation.length >= 2) {
       lastCam.current.forward = forwardFromRotationDeg(e.rotation);
     }
+    // Run a lightweight, throttled center hit-test to update reticle
+    // Note: some platforms require pixel coords
+    const { width, height } = Dimensions.get("window");
+    try {
+      sceneRef.current
+        ?.performARHitTestWithPoint?.(width / 2, height / 2)
+        ?.then?.((results: any[]) => {
+          if (!Array.isArray(results) || results.length === 0) {
+            setReticleVisible(false);
+            return;
+          }
+          // Prefer plane result if available; otherwise pick first
+          const plane = results.find((r) =>
+            r?.type?.includes?.("ExistingPlaneUsingExtent")
+          );
+          const best = plane ?? results[0];
+          const hitPos = best?.transform?.position ?? best?.position;
+          if (Array.isArray(hitPos) && hitPos.length === 3) {
+            setReticlePos([
+              Number(hitPos[0]) || 0,
+              Number(hitPos[1]) || 0,
+              Number(hitPos[2]) || 0,
+            ]);
+            setReticleVisible(true);
+          } else {
+            setReticleVisible(false);
+          }
+        })
+        .catch(() => setReticleVisible(false));
+    } catch {
+      /* noop */
+    }
   };
 
   const placeInFront = (distance = 1.0) => {
@@ -87,28 +142,75 @@ const Scene: React.FC<any> = (props) => {
       position[1] + forward[1] * distance,
       position[2] + forward[2] * distance,
     ];
-    console.log("[AR] place using camera pose →", target);
+    if (__DEV__) console.log("[AR] place using camera pose →", target);
     onRequestPlaceAt(target);
   };
 
   return (
     <ViroARScene
+      ref={sceneRef}
       onCameraTransformUpdate={onCameraTransformUpdate}
-      onClick={() => placeInFront(1.0)}
+      onClick={() => {
+        if (draggingRef.current) return;
+        // Prefer placing at reticle when available; fallback to 1m in front
+        if (reticleVisible && reticlePos) onRequestPlaceAt(reticlePos);
+        else placeInFront(1.0);
+      }}
       onClickState={(state: number) => {
-        if (state === ViroClickStateTypes.CLICKED) placeInFront(1.0);
+        if (draggingRef.current) return;
+        if (state === ViroClickStateTypes.CLICKED) {
+          if (reticleVisible && reticlePos) onRequestPlaceAt(reticlePos);
+          else placeInFront(1.0);
+        }
       }}
     >
       <ViroAmbientLight color="white" />
+      {/* Reticle to indicate a detected plane position */}
+      {reticleVisible && reticlePos && !placedPosition && (
+        <ViroQuad
+          position={reticlePos}
+          rotation={[-90, 0, 0]}
+          width={0.12}
+          height={0.12}
+          arShadowReceiver
+          materials={["reticleMaterial"]}
+          opacity={0.7}
+        />
+      )}
       {placedPosition && (
         <Viro3DObject
           source={{ uri: modelUrl }}
           type="GLB"
           position={placedPosition}
           scale={[scale, scale, scale]}
+          rotation={[
+            0,
+            (props.sceneNavigator.viroAppProps as any)?.rotationY ?? 0,
+            0,
+          ]}
           onLoadStart={onModelLoadStart}
           onLoadEnd={onModelLoadEnd}
-          onError={(e) => console.log("[AR] model error", e.nativeEvent)}
+          onError={(e) => console.error("[AR] model error", e.nativeEvent)}
+          dragType="FixedDistance"
+          onDrag={(dragToPos: Viro3DPoint) => {
+            markDragging();
+            onRequestPlaceAt(dragToPos, { silent: true });
+          }}
+          onPinch={(pinchState: number, scaleFactor: number) => {
+            // 1: start, 2: move, 3: end
+            const appProps = props.sceneNavigator.viroAppProps as any;
+            if (pinchState === 1) {
+              appProps.onPinchStart?.();
+              return;
+            }
+            if (pinchState === 2 || pinchState === 3) {
+              const adjusted = 1 + (scaleFactor - 1) * PINCH_SENSITIVITY;
+              // base scale is stored in parent on pinch start
+              const base = appProps.baseScale ?? appProps.scale;
+              const next = base * adjusted;
+              appProps.onPinchScale?.(next);
+            }
+          }}
         />
       )}
     </ViroARScene>
@@ -123,12 +225,15 @@ export default function ARScreen() {
   const [placedPosition, setPlacedPosition] = useState<Viro3DPoint | null>(
     null
   );
+  const [rotationY, setRotationY] = useState(0);
 
   // 🔹 모델 스케일 상태
   const [scale, setScale] = useState(0.1);
   const minScale = 0.01;
   const maxScale = 2.0;
   const step = 0.01;
+  const baseScaleRef = useRef(scale);
+  const pinchBaseRef = useRef<number | null>(null);
 
   // 토스트
   const [showToast, setShowToast] = useState(false);
@@ -159,22 +264,65 @@ export default function ARScreen() {
     }, 1000);
   };
 
-  const onRequestPlaceAt = (pos: Viro3DPoint) => {
-    console.log("[AR] place at", pos);
+  const onRequestPlaceAt = (pos: Viro3DPoint, opts?: { silent?: boolean }) => {
+    if (__DEV__) console.log("[AR] place at", pos);
     setPlacedPosition(pos);
-    showPlacementToast();
+    if (!opts?.silent) showPlacementToast();
   };
 
+  // Callbacks consumed by Scene via viroAppProps to update scale/rotation from gestures
+  const onPinchScale = (nextScale: number) => {
+    setScale((prev) => {
+      const clamped = Math.min(
+        maxScale,
+        Math.max(minScale, +nextScale.toFixed(3))
+      );
+      baseScaleRef.current = clamped;
+      return clamped;
+    });
+  };
+  const onPinchStart = () => {
+    pinchBaseRef.current = baseScaleRef.current;
+    // expose to Scene via app props
+    (viroAppProps as any).baseScale = pinchBaseRef.current;
+  };
+  const onRotateYBy = (deltaDeg: number) => {
+    setRotationY((prev) => prev + deltaDeg);
+  };
+
+  // Long-press continuous rotation
+  const rotateIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const startRotateHold = (dir: 1 | -1) => {
+    if (rotateIntervalRef.current) return;
+    rotateIntervalRef.current = setInterval(() => {
+      onRotateYBy(dir * 5);
+    }, 80);
+  };
+  const stopRotateHold = () => {
+    if (rotateIntervalRef.current) {
+      clearInterval(rotateIntervalRef.current);
+      rotateIntervalRef.current = null;
+    }
+  };
+  useEffect(() => {
+    return () => stopRotateHold();
+  }, []);
+
   const viroAppProps = useMemo<SceneBridgeProps>(
-    () => ({
-      modelUrl,
-      placedPosition,
-      onRequestPlaceAt,
-      onModelLoadStart: () => setIsLoading(true),
-      onModelLoadEnd: () => setIsLoading(false),
-      scale,
-    }),
-    [modelUrl, placedPosition, scale]
+    () =>
+      ({
+        modelUrl,
+        placedPosition,
+        onRequestPlaceAt,
+        onModelLoadStart: () => setIsLoading(true),
+        onModelLoadEnd: () => setIsLoading(false),
+        scale,
+        onPinchStart,
+        // gesture callbacks (as any to avoid leaking into public type)
+        onPinchScale,
+        rotationY,
+      } as any),
+    [modelUrl, placedPosition, scale, rotationY]
   );
 
   // 🔹 버튼 핸들러
@@ -190,6 +338,17 @@ export default function ARScreen() {
 
   return (
     <View style={{ flex: 1 }}>
+      {/* register reticle material once */}
+      {(() => {
+        try {
+          ViroMaterials.createMaterials?.({
+            reticleMaterial: {
+              diffuseColor: "#00FF88",
+            },
+          });
+        } catch {}
+        return null;
+      })()}
       {/* 상단 디버그 바 */}
       <View style={styles.header} pointerEvents="box-none">
         <RNText numberOfLines={1} style={styles.headerText}>
@@ -233,9 +392,19 @@ export default function ARScreen() {
         </View>
       </Modal>
 
-      {/* 🔹 하단 스케일 컨트롤러 (슬라이더 + +/-) */}
+      {/* 🔹 하단 컨트롤러 (회전 + 스케일) */}
       <View style={styles.scaleBar} pointerEvents="box-none">
         <View style={styles.scaleControls}>
+          {/* 회전: 좌 */}
+          <Pressable
+            style={styles.scaleBtn}
+            onPress={() => onRotateYBy(-10)}
+            delayLongPress={250}
+            onLongPress={() => startRotateHold(-1)}
+            onPressOut={stopRotateHold}
+          >
+            <RNText style={styles.scaleBtnText}>⟲</RNText>
+          </Pressable>
           <Pressable style={styles.scaleBtn} onPress={() => nudgeScale(-0.05)}>
             <RNText style={styles.scaleBtnText}>-</RNText>
           </Pressable>
@@ -255,6 +424,16 @@ export default function ARScreen() {
 
           <Pressable style={styles.scaleBtn} onPress={() => nudgeScale(+0.05)}>
             <RNText style={styles.scaleBtnText}>+</RNText>
+          </Pressable>
+          {/* 회전: 우 */}
+          <Pressable
+            style={styles.scaleBtn}
+            onPress={() => onRotateYBy(+10)}
+            delayLongPress={250}
+            onLongPress={() => startRotateHold(+1)}
+            onPressOut={stopRotateHold}
+          >
+            <RNText style={styles.scaleBtnText}>⟳</RNText>
           </Pressable>
         </View>
       </View>

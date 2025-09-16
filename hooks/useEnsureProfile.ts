@@ -14,7 +14,7 @@ export function useEnsureProfile() {
         error: getUserErr,
       } = await supabase.auth.getUser();
       if (getUserErr)
-        console.log("[profiles] getUser err:", getUserErr.message);
+        console.error("[profiles] getUser err:", getUserErr.message);
       if (!user) return;
 
       const { data: existing, error: selErr } = await supabase
@@ -22,9 +22,9 @@ export function useEnsureProfile() {
         .select("id, username")
         .eq("id", user.id)
         .maybeSingle();
-      if (selErr) console.log("[profiles] select err:", selErr?.message);
+      if (selErr) console.error("[profiles] select err:", selErr?.message);
       if (existing) {
-        console.log("[profiles] already exists, skip");
+        if (__DEV__) console.log("[profiles] already exists, skip");
         return;
       }
 
@@ -55,7 +55,7 @@ export function useEnsureProfile() {
       );
 
       if (error) console.error("[profiles] upsert error:", error);
-      else console.log("[profiles] upsert ok");
+      else if (__DEV__) console.log("[profiles] upsert ok");
     } finally {
       inflight.current = false;
     }
